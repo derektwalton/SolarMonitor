@@ -18,6 +18,7 @@
 #include "growroom.h"
 #include "greenhouse.h"
 
+#define ENABLE_PV 0
 #define ENABLE_RADIANT 1
 #define ENABLE_GROWROOM 0
 #define ENABLE_GROWROOM_EXT 0
@@ -317,6 +318,7 @@ static void get_honeywell(void)
 }
 #endif
 
+#if ENABLE_PV
 static void get_pv(void)
 {
   PV_t pv;
@@ -325,6 +327,7 @@ static void get_pv(void)
   recordValue("PVacPower", pv.acPower, !pv_isUnknown(pv.acPower));
   recordValue("PVacEnergy", pv.acEnergy, !pv_isUnknown(pv.acEnergy));
 }
+#endif
 
 #if ENABLE_GROWROOM
 static void get_growroom(void)
@@ -390,6 +393,10 @@ static void get_ttyUSB ( char *prolific,
 	*strstr(s," - Gravitech_ARDUINO") = 0;
 	strcpy(arduino,s);
       }
+      if (strstr(s," - 1a86_USB2.0-Ser_")) {
+	*strstr(s," - 1a86_USB2.0-Ser_") = 0;
+	strcpy(arduino,s);
+      }
     }
   }
 
@@ -448,7 +455,7 @@ main()
 #endif
   
   // Change the current working directory to root.
-  chdir("/home/udooer/solarMonitor");
+  chdir("/home/udooer/SolarMonitor/monitor");
 
   for(i=0;i<sizeof(samples)/sizeof(samples[0]);i++) {
     samples[i].valuePresent = 0;
@@ -470,10 +477,12 @@ main()
   }
 #endif
   
+#if ENABLE_PV
   err = pv_start(prolific);
   if (err) {
     printf("pv_start() fail\n");
   }
+#endif
 
 #if ENABLE_GROWROOM
   err = growroom_start();
@@ -489,7 +498,7 @@ main()
   }
 #endif
   
-  log_fileset_fopen(&fs,"/home/udooer/solarLogs/data_",".txt");
+  log_fileset_fopen(&fs,"/home/udooer/SolarMonitor/solarLogs/data_",".txt");
   
   while(1) {
 
@@ -510,7 +519,9 @@ main()
 #if ENABLE_HONEYWELL
     get_honeywell();
 #endif
+#if ENABLE_PV
     get_pv();
+#endif
 #if ENABLE_GROWROOM
     get_growroom();
 #endif

@@ -167,6 +167,8 @@ static void* task(void *arg)
     
     else {
 
+      //printf("%s\n",s);
+
       pthread_mutex_lock(&mutex);
       
       radiant.commLinkDown = 0;
