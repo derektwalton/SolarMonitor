@@ -101,8 +101,9 @@ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make dtbs -j5
 Compile the modules
 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make modules -j5
 
-All we really want from this whole build is ./drivers/usb/serial/ch341.ko.  Get this file over to the UDOO 
-machine and then we can follow the directions in ../CH341SER/Makefile to load the driver:
+All we really want from this whole build is ./drivers/usb/serial/ch341.ko.  I placed a prebuilt version at
+CH341SER/ch341.ko.  Get this file over to the UDOO machine and then we can follow the directions in
+CH341SER/Makefile to load the driver:
 
 sudo modprobe usbserial
 sudo insmod 
