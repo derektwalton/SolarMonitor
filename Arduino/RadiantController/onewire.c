@@ -8,6 +8,8 @@
 #include "onewire.h"
 #include "led.h"
 
+//#define DEBUG_ONEWIRE
+
 #define TRUE 1
 #define FALSE 0
 
@@ -17,7 +19,9 @@
 // 1 wire data bus 1
 //    tri-state in                       D5                     D5
 //    tri-state out                      D6                     D6
-//    tri-state oe                       D2                     D2
+//    tri-state oe_n                     D2                     D2
+//
+// 1/4 of 74125 quad transceiver used to drive onewire
 //
 
 #define DIRECT_READ         ((PIND & _BV(PD5)) ? 1 : 0)
@@ -56,20 +60,32 @@ int onewire_reset(void)
   // wait until the wire is high 
   DIRECT_MODE_INPUT;
   do {
-    if (--retries == 0) return 0;
+    if (--retries == 0) {
+#ifdef DEBUG_ONEWIRE
+      debug_puts("d: onewire_reset() bus not high\n");
+#endif
+      return 0;
+    }
     _delay_us(2);
-  } while ( !DIRECT_READ );
+  } while ( !DIRECT_READ );  
   
   // pull wire low for 500 uSec
   DIRECT_WRITE_LOW;
   DIRECT_MODE_OUTPUT;
   _delay_us(500);
+#ifdef DEBUG_ONEWIRE
+  if (DIRECT_READ)
+    debug_puts("d: onewire_reset() bus not low\n");
+#endif
   
   // float wire and then read wire
   DIRECT_MODE_INPUT;
   _delay_us(80);
   r = !DIRECT_READ;
   _delay_us(420);
+#ifdef DEBUG_ONEWIRE
+  if (!r) debug_puts("d: onewire_reset() no devices present\n");
+#endif
   
   return r;
 }
@@ -160,12 +176,19 @@ void onewire_skip()
   onewire_write(0xCC); // Skip ROM
 }
 
-void onewire_powerUp(int boost)
+int onewire_powerUp(void)
 {
 #if ONEWIRE_PARASITIC_POWER
   // drive data line high
   DIRECT_MODE_OUTPUT;
   DIRECT_WRITE_HIGH;
+  if (!DIRECT_READ) {
+#ifdef DEBUG_ONEWIRE
+    debug_puts("d: onewire_powerUp() not high\n");
+#endif
+    return 0;
+  }
+  return 1;
 #endif
 }
 

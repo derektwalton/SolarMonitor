@@ -68,7 +68,7 @@ static char *getNextField(char *string)
   return cPtr;
 }
 
-#if 1
+#if 0
 #define LOGF(a,b) printf("  %s %lf\n",a,b)
 #define LOGI(a,b) printf("  %s %d\n",a,b)
 #else

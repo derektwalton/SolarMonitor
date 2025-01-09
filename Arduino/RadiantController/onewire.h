@@ -9,7 +9,7 @@ int onewire_read();
 void onewire_select(unsigned char *rom);
 void onewire_skip();
 void onewire_powerDown();
-void onewire_powerUp();
+int onewire_powerUp();
 void onewire_resetSearch();
 int onewire_search(unsigned char *addr);
 unsigned char onewire_crc8(unsigned char *d, int len);

@@ -11,8 +11,8 @@
 #include "time.h"
 #include "f007th.h"
 
-#define DEBUG_TEMPERATURE_ONEWIRE
-#define DEBUG_TEMPERATURE_F007TH
+//#define DEBUG_TEMPERATURE_ONEWIRE
+//#define DEBUG_TEMPERATURE_F007TH
 
 double gTemperature[N_TEMPS];
 
@@ -74,6 +74,11 @@ static int temperature_onewire_Init(void)
 
   onewire_init();
 
+  if ( !onewire_powerUp() ) {
+    return FAIL;
+  }
+  _delay_ms(10);
+  
   if ( !onewire_reset() ) {
     return FAIL;
   }
@@ -138,28 +143,30 @@ static int temperature_onewire_UpdateTemperatures(void)
   double ftempC,ftempF;
 
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
-  debug_puts("d: onewire update temperatures\n");
+  debug_puts("d: temperature_onewire_UpdateTemperatures\n");
 #endif
   
-  onewire_powerUp();
-  _delay_ms(10);
-
   if (!initDone) {
     rCode = temperature_onewire_Init();
     if (rCode != SUCCESS) {
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
-      debug_puts("d: onewire_init fail\n");
+      debug_puts("d:   call to temperature_onewire_Init fail\n");
 #endif
       onewire_powerDown();
       return(rCode);
     }
     initDone = 1;
+  } else {
+    if ( !onewire_powerUp() ) {
+      return FAIL;
+    }
+    _delay_ms(10);
   }
 
   // tell all temperature chips to convert temperature
   if (!onewire_reset()) {
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
-    debug_puts("d: onewire_reset fail\n");
+    debug_puts("d:   call to onewire_reset fail\n");
 #endif
     onewire_powerDown();
     setUnknown_onewire();
@@ -179,14 +186,14 @@ static int temperature_onewire_UpdateTemperatures(void)
 
   // poll all temperatures
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
-  debug_puts("temperatures:\n");
+  debug_puts("d:   temperatures:\n");
 #endif
   for(i=0;i<NSENSORS;i++) {
     if (!sensors[i].foundIt) 
       continue;
     if (!onewire_reset()) {
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
-      debug_puts("d: onewire_reset fail\n");
+      debug_puts("d:   call to onewire_reset fail\n");
 #endif
       onewire_powerDown();
       setUnknown_onewire();
@@ -206,7 +213,7 @@ static int temperature_onewire_UpdateTemperatures(void)
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
       {
 	char s[64];
-	sprintf(s,"d: onewire crc error location %d\n",sensors[i].location);
+	sprintf(s,"d:   onewire crc error location %d\n",sensors[i].location);
 	debug_puts(s);
       }
 #endif
@@ -217,7 +224,7 @@ static int temperature_onewire_UpdateTemperatures(void)
 #ifdef DEBUG_TEMPERATURE_ONEWIRE
       {
 	char s[64];
-	sprintf(s,"d: onewire %5.11f location %d\n",sensors[i].location);
+	sprintf(s,"d:   onewire %5.11f location %d\n",ftempF,sensors[i].location);
 	debug_puts(s);
       }
 #endif
