@@ -18,8 +18,8 @@ static void txcb(void)
 
 #define HEADER_INTERVAL 20 // header every 20 lines
 
-static char header0[] = "// Uptime    |    Thermal Controller Outputs    |                          Radiant Controller Inputs                            |     Switches      |     Controller Outputs      | Extra |";
-static char header1[] = "// d:h:m:s    CollT  StorT  Aux1T  Aux2T Pmp UpL  Vac  Vpv T1st  T2nd  Tbas  Tout  TXchI TXchM TXchO THotO TRadR THTbR H1st H2nd Away HTub Sw3  Sw4  Radt HTub AuxF FDmp B1st B2nd  Troot  ";
+static char header0[] = "r: // Uptime    |    Thermal Controller Outputs    |                          Radiant Controller Inputs                            |     Switches      |     Controller Outputs      | Extra |";
+static char header1[] = "r: // d:h:m:s    CollT  StorT  Aux1T  Aux2T Pmp UpL  Vac  Vpv T1st  T2nd  Tbas  Tout  TXchI TXchM TXchO THotO TRadR THTbR H1st H2nd Away HTub Sw3  Sw4  Radt HTub AuxF FDmp B1st B2nd  Troot  ";
 
 void transmit(void)
 {
@@ -50,7 +50,7 @@ void transmit(void)
 
     case 2:
 
-      sprintf(s,"%3.3d:%2.2d:%2.2d:%2.2d ",
+      sprintf(s,"r: %3.3d:%2.2d:%2.2d:%2.2d ",
 	      upTime / 60 / 60 / 24, // days
 	      upTime / 60 / 60 % 24, // hours
 	      upTime / 60 % 60, // minutes

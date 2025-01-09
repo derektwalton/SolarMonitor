@@ -10,6 +10,8 @@
 #define SUCCESS 0
 #define FAIL 1
 
-//#define NO_I2C 1
+#define NO_I2C 1
+#define CONTROL_NO_TSTAT 1
+
 
 #endif

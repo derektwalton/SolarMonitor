@@ -22,6 +22,13 @@ static void txcb(void)
   txdone = 1;
 }
 
+void debug_puts(char *s)
+{
+  txdone = 0;
+  while(uart_puts(s, txcb)!=0);
+  while (!txdone);
+}
+
 void debug(char *s)
 {
 
@@ -168,7 +175,5 @@ void debug(char *s)
     
   }
 
-  txdone = 0;
-  uart_puts(s, txcb);
-  while (!txdone);
+  debug_puts(s);
 }

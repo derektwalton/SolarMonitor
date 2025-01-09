@@ -11,6 +11,9 @@
 #include "time.h"
 #include "f007th.h"
 
+#define DEBUG_TEMPERATURE_ONEWIRE
+#define DEBUG_TEMPERATURE_F007TH
+
 double gTemperature[N_TEMPS];
 
 // ----------------------------------------------------------------------------------------------------------
@@ -134,13 +137,19 @@ static int temperature_onewire_UpdateTemperatures(void)
   int itempC;
   double ftempC,ftempF;
 
-
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+  debug_puts("d: onewire update temperatures\n");
+#endif
+  
   onewire_powerUp();
   _delay_ms(10);
 
   if (!initDone) {
     rCode = temperature_onewire_Init();
     if (rCode != SUCCESS) {
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+      debug_puts("d: onewire_init fail\n");
+#endif
       onewire_powerDown();
       return(rCode);
     }
@@ -149,6 +158,9 @@ static int temperature_onewire_UpdateTemperatures(void)
 
   // tell all temperature chips to convert temperature
   if (!onewire_reset()) {
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+    debug_puts("d: onewire_reset fail\n");
+#endif
     onewire_powerDown();
     setUnknown_onewire();
     return(FAIL);
@@ -166,11 +178,16 @@ static int temperature_onewire_UpdateTemperatures(void)
 #endif  
 
   // poll all temperatures
-  //dc_log_printf("temperatures:");
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+  debug_puts("temperatures:\n");
+#endif
   for(i=0;i<NSENSORS;i++) {
     if (!sensors[i].foundIt) 
       continue;
     if (!onewire_reset()) {
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+      debug_puts("d: onewire_reset fail\n");
+#endif
       onewire_powerDown();
       setUnknown_onewire();
       return(FAIL);
@@ -186,12 +203,24 @@ static int temperature_onewire_UpdateTemperatures(void)
       } else {
 	sensors[i].failCount++;
       }
-      //dc_log_printf(" %s CRC error",sensors[i].name);
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+      {
+	char s[64];
+	sprintf(s,"d: onewire crc error location %d\n",sensors[i].location);
+	debug_puts(s);
+      }
+#endif
     } else {
       itempC = scratchPad[0] + (scratchPad[1]<<8);
       ftempC = ((double) itempC) * 0.0625;
       ftempF = ftempC * 9.0 / 5.0 + 32.0;
-      //dc_log_printf("  %5.1lf %s",ftempF+0.05,sensors[i].name);
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
+      {
+	char s[64];
+	sprintf(s,"d: onewire %5.11f location %d\n",sensors[i].location);
+	debug_puts(s);
+      }
+#endif
       if (gTemperature[sensors[i].location] != TEMPERATURE_UNKNOWN) {
 	if (ftempF > (gTemperature[sensors[i].location] + 5.0))
 	  ftempF += 0.5;
@@ -252,6 +281,10 @@ int temperature_f007th_update()
 {
   int i;
 
+#ifdef DEBUG_TEMPERATURE_F007TH
+  debug_puts("d: f007th update temperatures\n");
+#endif
+  
   // process incoming bitstream looking for temperature update packets
   f007th_poll();
 
@@ -297,4 +330,3 @@ int temperature_UpdateTemperatures(void)
     temperature_onewire_UpdateTemperatures();
   return(SUCCESS);
 }
-

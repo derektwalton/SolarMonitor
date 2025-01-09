@@ -1,4 +1,5 @@
-
+#define NO_I2C 1
+#define CONTROL_NO_TSTAT 1
 
 #include "defines.h"
 #include "uart.h"
@@ -15,6 +16,7 @@
 #include "control.h"
 #include "i2c.h"
 #include "cmdrsp.h"
+#include "debug.c"
 
 void setup() {
 
@@ -27,6 +29,7 @@ void setup() {
   i2c_init();
   temperature_Init();
 
+  debug_puts("d: INIT DONE\n");
 }
 
 void loop() {

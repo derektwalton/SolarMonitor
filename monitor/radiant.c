@@ -167,14 +167,18 @@ static void* task(void *arg)
     
     else {
 
-      //printf("%s\n",s);
+      printf("%s",s);
 
       pthread_mutex_lock(&mutex);
       
       radiant.commLinkDown = 0;
-      
+
+      // radiant messages begin with "r: "
+      field = NULL;
+      if (strlen(s) < 3 || s[0] != 'r' || s[1] != ':' || s[2] != ' ')
+	field = getNextField(s);
+
       // RUNTIME
-      field = getNextField(s);
       if (!field) 
 	radiant.uptime = RADIANT_MISSING;
       else if (strstr(field,"//")) {

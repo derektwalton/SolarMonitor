@@ -7,6 +7,8 @@
 #include "led.h"
 #include "thermal.h"
 
+//#define THERMAL_DEBUG
+
 volatile int rxdone = 0;
 
 void rxcb(char *s, int n, int error)
@@ -14,8 +16,9 @@ void rxcb(char *s, int n, int error)
   rxdone = 1;
 }
 
-#define MAXLEN (80+1)     // 80 characters plus termination 0
-#define TIMEOUT 10        // 10 seconds
+#define MAXLEN (80+1)        // 80 characters plus termination 0
+#define TIMEOUT 20           // 20 seconds
+#define MAX_TIMEOUT_COUNT 5  // 5 consecutive timeouts then set thermal values to unknown
 
 #define MAX_FAIL_COUNT 10
 
@@ -37,7 +40,7 @@ static char *getNextField(char *string)
   return cPtr;
 }
 
-static void parseLine(char *s)
+static int parseLine(char *s)
 {
   int i, hours, minutes;
   char *field;
@@ -125,6 +128,34 @@ static void parseLine(char *s)
 	  THERMAL_FLAGS_missingField |
 	  THERMAL_FLAGS_notUnderstood)) )
     failCount = 0; 
+
+#ifdef THERMAL_DEBUG
+  debug_puts("d: thermal summary:\n");
+  if (thermal.flags & THERMAL_FLAGS_commLinkDown) debug_puts("d: FLAGS_commLinkDown\n");
+  if (thermal.flags & THERMAL_FLAGS_missingField) debug_puts("d: FLAGS_missingField\n");
+  if (thermal.flags & THERMAL_FLAGS_notUnderstood) debug_puts("d: FLAGS_notUnderstood\n");
+  for(i=0;i<6;i++) {	
+    switch(i) {
+    case 0: t = thermal.collT; debug_puts("d: collT "); break;
+    case 1: t = thermal.storT; debug_puts("d: storT "); break;
+    case 2: t = thermal.diffT; debug_puts("d: diffT "); break;
+    case 3: t = thermal.hiliT; debug_puts("d: hiliT "); break;
+    case 4: t = thermal.aux1T; debug_puts("d: aux1T "); break;
+    case 5: t = thermal.aux2T; debug_puts("d: aux2T "); break;
+    }
+    if (t==THERMAL_MISSING) debug_puts("MISSING\n");
+    else if (t==THERMAL_OPEN) debug_puts("OPEN\n");
+    else if (t==THERMAL_SHORT) debug_puts("SHRT\n");
+    else if (t==THERMAL_NOTUNDERSTOOD) debug_puts("NOTUNDERSTOOD\n");
+    else {
+      char s[16];
+      sprintf(s,"%lf\n",t);
+      debug_puts(s);
+    }
+  }
+#endif
+  
+  return(failCount);
 }
 
 void thermal_poll(void)
@@ -132,11 +163,16 @@ void thermal_poll(void)
   static char s[MAXLEN];
   static int needsInit = 1;
   static long t0;
-  static int failCount = 0;
+  static int timeoutCount = 0;
 
   if (needsInit || rxdone) {
-    if (!needsInit) 
-      parseLine(s);
+    if (!needsInit) {
+#ifdef THERMAL_DEBUG
+      debug_puts("d: thermal recv ");
+      debug_puts(s);
+#endif
+      if (!parseLine(s)) timeoutCount=0;
+    }
     needsInit = 0;
     rxdone = 0;
     t0 = time_get();
@@ -144,16 +180,22 @@ void thermal_poll(void)
   }
 
   else if (time_elapsed_sec(t0) > TIMEOUT) {
-    if (++failCount > MAX_FAIL_COUNT) {
-      thermal.flags = THERMAL_FLAGS_commLinkDown;
-      thermal.collT = THERMAL_UNKNOWN;
-      thermal.storT = THERMAL_UNKNOWN;
-      thermal.diffT = THERMAL_UNKNOWN;
-      thermal.hiliT = THERMAL_UNKNOWN;
-      thermal.aux1T = THERMAL_UNKNOWN;
-      thermal.aux2T = THERMAL_UNKNOWN;
-      thermal.pump = THERMAL_UNKNOWN;
-      thermal.uplim = THERMAL_UNKNOWN;
+    t0 = time_get();
+    if (timeoutCount < MAX_TIMEOUT_COUNT) {
+      timeoutCount++;
+      debug_puts("d: thermal timeout\n");
+      if (timeoutCount == MAX_TIMEOUT_COUNT) {
+	debug_puts("d: thermal max fail count\n");
+	thermal.flags = THERMAL_FLAGS_commLinkDown;
+	thermal.collT = THERMAL_UNKNOWN;
+	thermal.storT = THERMAL_UNKNOWN;
+	thermal.diffT = THERMAL_UNKNOWN;
+	thermal.hiliT = THERMAL_UNKNOWN;
+	thermal.aux1T = THERMAL_UNKNOWN;
+	thermal.aux2T = THERMAL_UNKNOWN;
+	thermal.pump = THERMAL_UNKNOWN;
+	thermal.uplim = THERMAL_UNKNOWN;
+      }
     }
   }
 
