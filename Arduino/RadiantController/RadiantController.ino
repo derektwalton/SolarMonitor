@@ -1,6 +1,4 @@
 
-// Include Arduino FreeRTOS library
-#include <Arduino_FreeRTOS.h>
 
 #include "defines.h"
 #include "uart.h"
