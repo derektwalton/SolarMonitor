@@ -1,0 +1,3 @@
+#!/bin/bash
+
+avrdude -v -patmega328p -carduino -P/dev/ttyUSB0 -b57600 -D -Uflash:w:./RadiantController.ino.eightanaloginputs.hex:i
