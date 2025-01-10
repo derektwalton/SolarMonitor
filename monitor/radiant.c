@@ -59,12 +59,12 @@ static char *getNextField(char *string)
     cPtr = string;
   else {
     // walk past field value to space
-    while(*cPtr && *cPtr != ' ') cPtr++;
-    if (!*cPtr) return NULL;
+    while(cPtr && *cPtr && *cPtr != ' ') cPtr++;
+    if (cPtr && !*cPtr) cPtr = NULL;
   }
   // walk to next field value value (ie. non-space)
-  while(*cPtr && *cPtr == ' ') cPtr++;
-  if (!*cPtr) return NULL;
+  while(cPtr && *cPtr && *cPtr == ' ') cPtr++;
+  if (cPtr && !*cPtr) cPtr = NULL;
   return cPtr;
 }
 
@@ -175,8 +175,8 @@ static void* task(void *arg)
 
       // radiant messages begin with "r: "
       field = NULL;
-      if (strlen(s) < 3 || s[0] != 'r' || s[1] != ':' || s[2] != ' ')
-	field = getNextField(s);
+      if ( strlen(s) > 3 && s[0] == 'r' && s[1] == ':' && s[2] == ' ' )
+	field = getNextField(&s[3]);
 
       // RUNTIME
       if (!field) 

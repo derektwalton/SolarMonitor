@@ -2,6 +2,6 @@
 
 echo "Content-type: text/html"
 echo ''
-cd /home/udooer/plot
+cd /home/udooer/SolarMonitor/plot
 ./plot -greenhouse > /dev/null
 gnuplot < out.plt
