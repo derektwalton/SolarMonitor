@@ -37,48 +37,64 @@ static void* task(void *arg)
   
   while (1) {
 
-    for(i=0;i<sizeof(locations)/sizeof(locations[0]);i++) {
-    
-      sprintf(command,"./honeywell_%s.py -s",locations[i].name);
-      fp = popen(command,"r");
+    sprintf(command,"./honeywell.py -s");
+    fp = popen(command,"r");
       
-      if (fp) {
-	double temperature=HONEYWELL_UNKNOWN;
-	double setpoint=HONEYWELL_UNKNOWN;
-	double fanIsRunning=HONEYWELL_UNKNOWN;
-	while(fgets(data,512,fp)) {
-	  char c;
+    if (fp) {
+      double temperature_1st=HONEYWELL_UNKNOWN;
+      double setpoint_1st=HONEYWELL_UNKNOWN;
+      double fanIsRunning_1st=HONEYWELL_UNKNOWN;
+      double temperature_2nd=HONEYWELL_UNKNOWN;
+      double setpoint_2nd=HONEYWELL_UNKNOWN;
+      double fanIsRunning_2nd=HONEYWELL_UNKNOWN;
+      while(fgets(data,512,fp)) {
+	char c;
 #ifdef DEBUG_HONEYWELL
-	  fprintf(stdout,"honeywell %s %s",locations[i].name,data);
+	fprintf(stdout,"honeywell %s",data);
 #endif
-	  sscanf(data,"Indoor Temperature: %lf",&temperature);
-	  sscanf(data,"Heat Setpoint: %lf",&setpoint);
-	  if (sscanf(data,"fanIsRunning: %c",&c)==1)
-	    fanIsRunning=(c=='T') ? 1 : 0;
-	}
-	fclose(fp);
+	sscanf(data,"1st Indoor Temperature: %lf",&temperature_1st);
+	sscanf(data,"1st Heat Setpoint: %lf",&setpoint_1st);
+	if (sscanf(data,"1st fanIsRunning: %c",&c)==1)
+	  fanIsRunning_1st=(c=='T') ? 1 : 0;
+	sscanf(data,"2nd Indoor Temperature: %lf",&temperature_2nd);
+	sscanf(data,"2nd Heat Setpoint: %lf",&setpoint_2nd);
+	if (sscanf(data,"2nd fanIsRunning: %c",&c)==1)
+	  fanIsRunning_2nd=(c=='T') ? 1 : 0;
+      }
+      fclose(fp);
 
-	if ( temperature != HONEYWELL_UNKNOWN &&
-	     setpoint != HONEYWELL_UNKNOWN &&
-	     fanIsRunning != HONEYWELL_UNKNOWN ) {
-	  pthread_mutex_lock(&mutex);
-	  locations[i].temperature = temperature;
-	  locations[i].setpoint = setpoint;
-	  locations[i].fanIsRunning = fanIsRunning;
-	  time(&locations[i].time);
-	  pthread_mutex_unlock(&mutex);
+      if ( temperature_1st != HONEYWELL_UNKNOWN &&
+	   setpoint_1st != HONEYWELL_UNKNOWN &&
+	   fanIsRunning_1st != HONEYWELL_UNKNOWN &&
+	   temperature_2nd != HONEYWELL_UNKNOWN &&
+	   setpoint_2nd != HONEYWELL_UNKNOWN &&
+	   fanIsRunning_2nd != HONEYWELL_UNKNOWN ) {
+	pthread_mutex_lock(&mutex);
+	locations[0].temperature = temperature_1st;
+	locations[0].setpoint = setpoint_1st;
+	locations[0].fanIsRunning = fanIsRunning_1st;
+	time(&locations[0].time);
+	locations[1].temperature = temperature_2nd;
+	locations[1].setpoint = setpoint_2nd;
+	locations[1].fanIsRunning = fanIsRunning_2nd;
+	time(&locations[1].time);
+	pthread_mutex_unlock(&mutex);
 #ifdef DEBUG_HONEYWELL
-	  fprintf(stdout,"honeywell %s temp=%lf setpoint=%lf fan=%lf\n",
-		  locations[i].name,
-		  locations[i].temperature,
-		  locations[i].setpoint,
-		  locations[i].fanIsRunning);
+	fprintf(stdout,"honeywell %s temp=%lf setpoint=%lf fan=%lf\n",
+		locations[0].name,
+		locations[0].temperature,
+		locations[0].setpoint,
+		locations[0].fanIsRunning);
+	fprintf(stdout,"honeywell %s temp=%lf setpoint=%lf fan=%lf\n",
+		locations[1].name,
+		locations[1].temperature,
+		locations[1].setpoint,
+		locations[1].fanIsRunning);
 #endif
-	} else {
+      } else {
 #ifdef DEBUG_HONEYWELL
-	  fprintf(stdout,"honeywell %s UNKNOWN\n",locations[i].name);
+	fprintf(stdout,"honeywell UNKNOWN\n");
 #endif
-	}
 
 	// honeywell service is not happy if polled too quickly 
 	// so wait 5 minutes between polls

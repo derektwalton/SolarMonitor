@@ -18,7 +18,7 @@
 #include "growroom.h"
 #include "greenhouse.h"
 
-#define ENABLE_PV 1
+#define ENABLE_PV 0
 #define ENABLE_RADIANT 1
 #define ENABLE_GROWROOM 0
 #define ENABLE_GROWROOM_EXT 0

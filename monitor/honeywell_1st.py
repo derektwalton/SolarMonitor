@@ -171,8 +171,8 @@ def get_login(action, value=None, hold_time=1):
         #print r3.status, r3.reason
         rawdata=r3.read()
         j = json.loads(rawdata)
-        #print "R3 Dump"
-        #print json.dumps(j,indent=2)
+        print "R3 Dump"
+        print json.dumps(j,indent=2)
         #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
         #print "Success:",j['success']
         #print "Live",j['deviceLive']
@@ -181,9 +181,9 @@ def get_login(action, value=None, hold_time=1):
         #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
         print "Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
         #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
-        #print "Status Cool:",j['latestData']['uiData']["StatusCool"]
-        #print "Status Heat:",j['latestData']['uiData']["StatusHeat"]
-        #print "Status Fan:",j['latestData']['fanData']["fanMode"]
+        print "Status Cool:",j['latestData']['uiData']["StatusCool"]
+        print "Status Heat:",j['latestData']['uiData']["StatusHeat"]
+        print "Status Fan:",j['latestData']['fanData']["fanMode"]
         print "fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
 
         logout(headers)

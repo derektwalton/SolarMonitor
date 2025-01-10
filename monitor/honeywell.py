@@ -8,7 +8,8 @@
 
 USERNAME="derek.t.walton@gmail.com"
 PASSWORD="&k&b#s&2NSZM7PY"
-DEVICE_ID=3535964   # number at the end of URL of the honeywell control page
+DEVICE_ID_1ST=9494612   # number at the end of URL of the honeywell control page
+DEVICE_ID_2ND=3535964   # number at the end of URL of the honeywell control page
 
 ############################ End settings ############################
 
@@ -64,12 +65,9 @@ def logout(headers):
      r5 = conn.getresponse()
      print "logged out: " +  str(r5.status) + str(r5.reason)
 
-def get_login(action, value=None, hold_time=1):
+def get_login():
     
     cookiejar=None
-    #print
-    #print
-    #print "Run at ",datetime.datetime.now()
     headers={"Content-Type":"application/x-www-form-urlencoded",
             "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Encoding":"sdch",
@@ -128,10 +126,11 @@ def get_login(action, value=None, hold_time=1):
         return
 
 
-   # Skip second query - just go directly to our device_id, rather than letting it
-    # redirect us to it. 
+    #
+    # Poll our devices
+    #
 
-    code=str(DEVICE_ID)
+    code=str(DEVICE_ID_1ST)
 
     t = datetime.datetime.now()
     utc_seconds = (time.mktime(t.timetuple()))
@@ -166,35 +165,39 @@ def get_login(action, value=None, hold_time=1):
 
     # Print thermostat information returned
 
-    if (action == "status"):
+    #print r3.status, r3.reason
+    rawdata=r3.read()
+    j = json.loads(rawdata)
+    print "1st R3 Dump"
+    print json.dumps(j,indent=2)
+    #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
+    #print "Success:",j['success']
+    #print "Live",j['deviceLive']
+    print "1st Indoor Temperature:",j['latestData']['uiData']["DispTemperature"]
+    #print "Indoor Humidity:",j['latestData']['uiData']["IndoorHumidity"]
+    #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
+    print "1st Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
+    #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
+    print "1st Status Cool:",j['latestData']['uiData']["StatusCool"]
+    print "1st Status Heat:",j['latestData']['uiData']["StatusHeat"]
+    print "1st Status Fan:",j['latestData']['fanData']["fanMode"]
+    print "1st fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
     
-        #print r3.status, r3.reason
-        rawdata=r3.read()
-        j = json.loads(rawdata)
-        print "R3 Dump"
-        print json.dumps(j,indent=2)
-        #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
-        #print "Success:",j['success']
-        #print "Live",j['deviceLive']
-        print "Indoor Temperature:",j['latestData']['uiData']["DispTemperature"]
-        #print "Indoor Humidity:",j['latestData']['uiData']["IndoorHumidity"]
-        #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
-        print "Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
-        #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
-        print "Status Cool:",j['latestData']['uiData']["StatusCool"]
-        print "Status Heat:",j['latestData']['uiData']["StatusHeat"]
-        print "Status Fan:",j['latestData']['fanData']["fanMode"]
-        print "fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
 
-        logout(headers)
+    code=str(DEVICE_ID_2ND)
 
-        return
-    
+    t = datetime.datetime.now()
+    utc_seconds = (time.mktime(t.timetuple()))
+    utc_seconds = int(utc_seconds*1000)
+    #print "Code ",code
+
+    location="/portal/Device/CheckDataSession/"+code+"?_="+str(utc_seconds)
+    #print "THIRD"
     headers={
-            "Accept":'application/json; q=0.01',
+            "Accept":"*/*",
             "DNT":"1",
-            "Accept-Encoding":"gzip,deflate,sdch",
-            'Content-Type':'application/json; charset=UTF-8',
+            #"Accept-Encoding":"gzip,deflate,sdch",
+            "Accept-Encoding":"plain",
             "Cache-Control":"max-age=0",
             "Accept-Language":"en-US,en,q=0.8",
             "Connection":"keep-alive",
@@ -202,117 +205,47 @@ def get_login(action, value=None, hold_time=1):
             "Referer":"https://mytotalconnectcomfort.com/portal/",
             "X-Requested-With":"XMLHttpRequest",
             "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36",
-            'Referer':"/TotalConnectComfort/Device/CheckDataSession/"+code,
             "Cookie":cookie
         }
-
-
-    # Data structure with data we will send back
-
-    payload = {
-        "CoolNextPeriod": None,
-        "CoolSetpoint": None,
-        "DeviceID": DEVICE_ID,
-        "FanMode": None,
-        "HeatNextPeriod": None,
-        "HeatSetpoint": None,
-        "StatusCool": 0,
-        "StatusHeat": 0,
-        "SystemSwitch": None
-    }
-
-
-    # Calculate the hold time for cooling/heating
-
-    t = datetime.datetime.now();
-
-    stop_time = ((t.hour+hold_time)%24) * 60 + t.minute
-    stop_time = stop_time/15
-
-
-    # Modify payload based on user input
-
-    if (action == "cool"):
-      payload["CoolSetpoint"] = value
-      payload["StatusCool"] = 1
-      payload["StatusHeat"] = 1
-      payload["CoolNextPeriod"] = stop_time
-    
-    if (action == "heat"):
-      payload["HeatSetpoint"] = value
-      payload["StatusCool"] = 1
-      payload["StatusHeat"] = 1
-      payload["HeatNextPeriod"] = stop_time
-
-    if (action == "cancel"):
-      payload["StatusCool"] = 0
-      payload["StatusHeat"] = 0
-
-    if (action == "fan"):
-      payload["FanMode"] = value
-
-
-    # Prep and send payload
-
-    location="/portal/Device/SubmitControlScreenChanges"
-
-    rawj=json.dumps(payload)
-        
-    conn = httplib.HTTPSConnection("mytotalconnectcomfort.com");
+    conn = httplib.HTTPSConnection("mytotalconnectcomfort.com")
     #conn.set_debuglevel(999);
-    #print "R4 will send"
-    #print rawj
-    conn.request("POST", location,rawj,headers)
-    r4 = conn.getresponse()
-    if (r4.status != 200): 
-      print("Error Didn't get 200 status on R4 status={0} {1}".format(r4.status,r4.reason))
+    #print "LOCATION R3 is",location
+    conn.request("GET", location,None,headers)
+    r3 = conn.getresponse()
+    if (r3.status != 200):
+      print("Error Didn't get 200 status on R3 status={0} {1}".format(r3.status,r3.reason))
       return
-    else:
-        print "Success in configuring thermostat!"
-    #  print "R4 got 200"
 
+
+    # Print thermostat information returned
+
+    #print r3.status, r3.reason
+    rawdata=r3.read()
+    j = json.loads(rawdata)
+    print "2nd R3 Dump"
+    print json.dumps(j,indent=2)
+    #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
+    #print "Success:",j['success']
+    #print "Live",j['deviceLive']
+    print "2nd Indoor Temperature:",j['latestData']['uiData']["DispTemperature"]
+    #print "Indoor Humidity:",j['latestData']['uiData']["IndoorHumidity"]
+    #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
+    print "2nd Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
+    #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
+    print "2nd Status Cool:",j['latestData']['uiData']["StatusCool"]
+    print "2nd Status Heat:",j['latestData']['uiData']["StatusHeat"]
+    print "2nd Status Fan:",j['latestData']['fanData']["fanMode"]
+    print "2nd fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
+    
     logout(headers)
 
+    return
 
-def printUsage():
-    print
-    print "Cooling: -c temperature -t hold_time"
-    print "Heating: -h temperature -t hold_time"
-    print "Status: -s"
-    print "Cancel: -x"
-    print "Fan: -f [0=auto|1=on]"
-    print
-    print "Example: Set temperature to cool to 80f for 1 hour: \n\t therm.py -c 80 -t 1"
-    print
-    print "If no -t hold_time is provided, it will default to one hour from command time."
-    print
-    
-    
+
 def main():
 
-    if sys.argv[1] == "-s":
-        get_login("status")
-        sys.exit()
+  get_login()
+  sys.exit()
 
-    if sys.argv[1] == "-x":
-        get_login("cancel")
-        sys.exit()        
-        
-    if (len(sys.argv) < 3) or (sys.argv[1] == "-help"):
-        printUsage()
-        sys.exit()
-        
-    if sys.argv[1] == "-c":
-        get_login("cool", sys.argv[2])
-        sys.exit()
-
-    if sys.argv[1] == "-h":
-        get_login("heat", sys.argv[2])
-        sys.exit()
-
-    if sys.argv[1] == "-f":
-        get_login("fan", sys.argv[2])
-        sys.exit()        
-        
 if __name__ == "__main__":
     main()
