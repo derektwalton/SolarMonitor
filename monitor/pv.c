@@ -7,8 +7,11 @@
 #include <pthread.h>
 #include <time.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "pv.h"
+
+//#define DEBUG_PV
 
 /* baudrate settings are defined in <asm/termbits.h>, which is
 included by <termios.h> */
@@ -39,8 +42,8 @@ static int response_get(int fd, uint8_t *rsp, int n)
     if(result==0)
       break;
   }
-#if 0
-  fprintf(stdout,"%s %d:",__func__,i);
+#ifdef DEBUG_PV
+  fprintf(stdout,"%s exp %d got %d:",__func__,n,i);
   for(j=0;j<i;j++)
     fprintf(stdout," 0x%.2x",rsp[j]);
   fprintf(stdout,"\n");
@@ -61,7 +64,7 @@ static void* task(void *arg)
      because we don't want to get killed if linenoise sends CTRL-C.
   */
   fd = open(device, O_RDWR | O_NOCTTY ); 
-  if (fd <0) {perror(device); exit(-1); }
+  if (fd <0) {perror(device); exit(1); }
   
   tcgetattr(fd,&oldtio); /* save current serial port settings */
   bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
@@ -134,8 +137,20 @@ static void* task(void *arg)
   pv.acEnergy = PV_UNKNOWN;
   pv.acVoltage = PV_UNKNOWN;
 
+#ifdef DEBUG_PV
+#define LOGF(a,b) printf("  %s %lf\n",a,b)
+#define LOGI(a,b) printf("  %s %d\n",a,b)
+#else
+#define LOGF(a,b)
+#define LOGI(a,b)
+#endif
+
   while (1) {
 
+#ifdef DEBUG_PV
+    printf("pv_task poll\n");
+#endif
+    
     flags = 0;
 
     write(fd,cmd_getDCVoltage,sizeof(cmd_getDCVoltage));
@@ -144,6 +159,7 @@ static void* task(void *arg)
     if (result == 9) {
       j = (rsp[4]<<8) | (rsp[5]);
       pv.dcVoltage = ((double)j) / 10.0;
+      LOGF("dcVoltage",pv.dcVoltage);
       failCount = 0;
     } else {
       if (++failCount > MAX_FAIL_COUNT) {
@@ -159,6 +175,7 @@ static void* task(void *arg)
     if (result == 9) {
       j = (rsp[4]<<8) | (rsp[5]);
       pv.acPower = ((double)j);	  
+      LOGF("acPower",pv.acPower);
       failCount = 0;
     } else {
       if (++failCount > MAX_FAIL_COUNT) {
@@ -174,6 +191,7 @@ static void* task(void *arg)
     if (result == 9) {
       j = (rsp[4]<<8) | (rsp[5]);
       pv.acCurrent = ((double)j) / 10.0;	  
+      LOGF("acCurrent",pv.acCurrent);
       failCount = 0;
     } else {
       if (++failCount > MAX_FAIL_COUNT) {
@@ -191,6 +209,7 @@ static void* task(void *arg)
       pv.acEnergy = ((double)j) / 10.0;
       j = (rsp[4]<<8) | (rsp[5]);
       pv.acEnergy += ((double)j) * 1000.0;
+      LOGF("acEnergy",pv.acEnergy);
       failCount = 0;
     } else {
       if (++failCount > MAX_FAIL_COUNT) {
@@ -206,6 +225,7 @@ static void* task(void *arg)
     if (result == 9) {
       j = (rsp[4]<<8) | (rsp[5]);
       pv.acVoltage = ((double)j) / 10.0;	  
+      LOGF("acVoltage",pv.acVoltage);
       failCount = 0;
     } else {
       if (++failCount > MAX_FAIL_COUNT) {
@@ -217,6 +237,9 @@ static void* task(void *arg)
 
     sleep(10);
   }
+
+#undef LOGF
+#undef LOGI  
 
   /* restore the old port settings */
   tcsetattr(fd,TCSANOW,&oldtio);

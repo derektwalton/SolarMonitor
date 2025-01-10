@@ -18,12 +18,12 @@
 #include "growroom.h"
 #include "greenhouse.h"
 
-#define ENABLE_PV 0
+#define ENABLE_PV 1
 #define ENABLE_RADIANT 1
 #define ENABLE_GROWROOM 0
 #define ENABLE_GROWROOM_EXT 0
 #define ENABLE_GREENHOUSE 0
-#define ENABLE_HONEYWELL 0
+#define ENABLE_HONEYWELL 1
 #define ENABLE_THINGSPEAK 0
 
 
@@ -311,10 +311,6 @@ static void get_honeywell(void)
   recordValue("Tstat_lake_2nd_T", honeywell.lake_2nd_T, !honeywell_isUnknown(honeywell.lake_2nd_T));
   recordValue("Tstat_lake_2nd_Tsetpoint", honeywell.lake_2nd_Tsetpoint, !honeywell_isUnknown(honeywell.lake_2nd_Tsetpoint));
   recordValue("Tstat_lake_2nd_fan", honeywell.lake_2nd_fan, !honeywell_isUnknown(honeywell.lake_2nd_fan));
-
-  recordValue("Tstat_condo_T", honeywell.condo_T, !honeywell_isUnknown(honeywell.condo_T));
-  recordValue("Tstat_condo_Tsetpoint", honeywell.condo_Tsetpoint, !honeywell_isUnknown(honeywell.condo_Tsetpoint));
-  recordValue("Tstat_condo_fan", honeywell.condo_fan, !honeywell_isUnknown(honeywell.condo_fan));
 }
 #endif
 

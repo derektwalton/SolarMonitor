@@ -7,8 +7,8 @@
 ####################### Fill in settings below #######################
 
 USERNAME="derek.t.walton@gmail.com"
-PASSWORD="Gran1teLake"
-DEVICE_ID=2307841   # number at the end of URL of the honeywell control page
+PASSWORD="&k&b#s&2NSZM7PY"
+DEVICE_ID=9494612   # number at the end of URL of the honeywell control page
 
 ############################ End settings ############################
 
@@ -57,7 +57,12 @@ def export_cookiejar(jar):
     s+='%s=%s;' % (x,jar[x])
   return s
 
-
+def logout(headers):
+     # https://mytotalconnectcomfort.com/portal/Account/LogOff
+     conn = httplib.HTTPSConnection("mytotalconnectcomfort.com");
+     conn.request("GET", "https://mytotalconnectcomfort.com/portal/Account/LogOff",None,headers)
+     r5 = conn.getresponse()
+     print "logged out: " +  str(r5.status) + str(r5.reason)
 
 def get_login(action, value=None, hold_time=1):
     
@@ -181,6 +186,8 @@ def get_login(action, value=None, hold_time=1):
         #print "Status Fan:",j['latestData']['fanData']["fanMode"]
         print "fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
 
+        logout(headers)
+
         return
     
     headers={
@@ -263,6 +270,8 @@ def get_login(action, value=None, hold_time=1):
     else:
         print "Success in configuring thermostat!"
     #  print "R4 got 200"
+
+    logout(headers)
 
 
 def printUsage():

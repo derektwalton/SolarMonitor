@@ -9,6 +9,8 @@
 
 #include "honeywell.h"
 
+#define DEBUG_HONEYWELL
+
 static pthread_t tid;
 static pthread_mutex_t mutex;
 
@@ -22,7 +24,6 @@ struct {
   {
     { "1st", HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN },
     { "2nd", HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN },
-    { "condo", HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN, HONEYWELL_UNKNOWN },
   };
 
 
@@ -42,23 +43,19 @@ static void* task(void *arg)
       fp = popen(command,"r");
       
       if (fp) {
-	double temperature, setpoint, fanIsRunning;
-	char c;
-	fgets(data,512,fp);
-	//fputs(data,stdout);
-	if (sscanf(data,"Indoor Temperature: %lf",&temperature)!=1)
-	  temperature=HONEYWELL_UNKNOWN;
-	fgets(data,512,fp);
-	//fputs(data,stdout);
-	if (sscanf(data,"Heat Setpoint: %lf",&setpoint)!=1)
-	  setpoint=HONEYWELL_UNKNOWN;
-	fgets(data,512,fp);
-	//fputs(data,stdout);
-	if (sscanf(data,"fanIsRunning: %c",&c)!=1)
-	  fanIsRunning=HONEYWELL_UNKNOWN;
-	else
-	  fanIsRunning=(c=='T') ? 1 : 0;
-
+	double temperature=HONEYWELL_UNKNOWN;
+	double setpoint=HONEYWELL_UNKNOWN;
+	double fanIsRunning=HONEYWELL_UNKNOWN;
+	while(fgets(data,512,fp)) {
+	  char c;
+#ifdef DEBUG_HONEYWELL
+	  fprintf(stdout,"honeywell %s %s",locations[i].name,data);
+#endif
+	  sscanf(data,"Indoor Temperature: %lf",&temperature);
+	  sscanf(data,"Heat Setpoint: %lf",&setpoint);
+	  if (sscanf(data,"fanIsRunning: %c",&c)==1)
+	    fanIsRunning=(c=='T') ? 1 : 0;
+	}
 	fclose(fp);
 
 	if ( temperature != HONEYWELL_UNKNOWN &&
@@ -70,14 +67,22 @@ static void* task(void *arg)
 	  locations[i].fanIsRunning = fanIsRunning;
 	  time(&locations[i].time);
 	  pthread_mutex_unlock(&mutex);
-#if 0
-	  fprintf(stdout,"honeywell %s %lf %lf %lf\n",
+#ifdef DEBUG_HONEYWELL
+	  fprintf(stdout,"honeywell %s temp=%lf setpoint=%lf fan=%lf\n",
 		  locations[i].name,
 		  locations[i].temperature,
 		  locations[i].setpoint,
 		  locations[i].fanIsRunning);
 #endif
+	} else {
+#ifdef DEBUG_HONEYWELL
+	  fprintf(stdout,"honeywell %s UNKNOWN\n",locations[i].name);
+#endif
 	}
+
+	// honeywell service is not happy if polled too quickly 
+	// so wait 5 minutes between polls
+	sleep(5*60);
       }
     }
   }
@@ -110,10 +115,6 @@ int honeywell_sample(HONEYWELL_t *h)
   h->lake_2nd_Tsetpoint = HONEYWELL_UNKNOWN;
   h->lake_2nd_fan = HONEYWELL_UNKNOWN;
 
-  h->condo_T = HONEYWELL_UNKNOWN;
-  h->condo_Tsetpoint = HONEYWELL_UNKNOWN;
-  h->condo_fan = HONEYWELL_UNKNOWN;
-
   time(&now);
   
   pthread_mutex_lock(&mutex);
@@ -127,11 +128,6 @@ int honeywell_sample(HONEYWELL_t *h)
     h->lake_2nd_T = locations[1].temperature;
     h->lake_2nd_Tsetpoint = locations[1].setpoint;
     h->lake_2nd_fan = locations[1].fanIsRunning;
-  }
-  if (difftime(now,locations[2].time)<2*60) {
-    h->condo_T = locations[2].temperature;
-    h->condo_Tsetpoint = locations[2].setpoint;
-    h->condo_fan = locations[2].fanIsRunning;
   }
 
   pthread_mutex_unlock(&mutex);

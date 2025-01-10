@@ -11,10 +11,6 @@ typedef struct {
   double lake_2nd_Tsetpoint;
   double lake_2nd_fan;
 
-  double condo_T;
-  double condo_Tsetpoint;
-  double condo_fan;
-
 } HONEYWELL_t;
 
 #define HONEYWELL_UNKNOWN (-95)

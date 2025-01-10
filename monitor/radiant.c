@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #include "radiant.h"
 
@@ -90,7 +91,7 @@ static void* task(void *arg)
      because we don't want to get killed if linenoise sends CTRL-C.
   */
   fd = open(device, O_RDWR | O_NOCTTY ); 
-  if (fd <0) {perror(device); exit(-1); }
+  if (fd <0) {perror(device); exit(1); }
   
   tcgetattr(fd,&oldtio); /* save current serial port settings */
   bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
@@ -320,6 +321,9 @@ static void* task(void *arg)
     }    
 
   }
+
+#undef LOGF
+#undef LOGI  
 
   /* restore the old port settings */
   tcsetattr(fd,TCSANOW,&oldtio);
