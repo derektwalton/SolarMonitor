@@ -95,11 +95,11 @@ static void* task(void *arg)
 #ifdef DEBUG_HONEYWELL
 	fprintf(stdout,"honeywell UNKNOWN\n");
 #endif
-
-	// honeywell service is not happy if polled too quickly 
-	// so wait 5 minutes between polls
-	sleep(5*60);
       }
+      
+      // honeywell service is not happy if polled too quickly 
+      // so wait 4 minutes between polls
+      sleep(4*60);
     }
   }
 }
@@ -135,12 +135,12 @@ int honeywell_sample(HONEYWELL_t *h)
   
   pthread_mutex_lock(&mutex);
 
-  if (difftime(now,locations[0].time)<2*60) {
+  if (difftime(now,locations[0].time)<(3*4+1)*60) {
     h->lake_1st_T = locations[0].temperature;
     h->lake_1st_Tsetpoint = locations[0].setpoint;
     h->lake_1st_fan = locations[0].fanIsRunning;
   }
-  if (difftime(now,locations[1].time)<2*60) {
+  if (difftime(now,locations[1].time)<(3*4+1)*60) {
     h->lake_2nd_T = locations[1].temperature;
     h->lake_2nd_Tsetpoint = locations[1].setpoint;
     h->lake_2nd_fan = locations[1].fanIsRunning;
