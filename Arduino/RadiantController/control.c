@@ -168,27 +168,17 @@ static void control_thermalDump(void)
 
 /*
 
-House heat control
+House heat call monitoring
 
 This radiant controller also monitors the internal house temperatures, and the state of the forced
 hot air heating system (ie. whether the 1st floor or 2nd floor thermostats are calling for heat).
-Eventually, I expect that a command over the command/response link will be able to be used to 
-cause the radiant controller to temporarily boost house temperature by calling for heat from the
-forced hot air system.
 
 */
 
-#if CONTROL_NO_TSTAT
-
-static void control_houseHeat(void) {}
-
-#else
+//#define DEBUG_TSTAT
 
 int heat1stFloor = 0;
 int heat2ndFloor = 0;
-
-int heat1stFloorBoost = 0;
-int heat2ndFloorBoost = 0;
 
 int tstat0,tstat1;
 
@@ -203,42 +193,17 @@ static void control_houseHeat(void)
     tstat0 = adcSample(ADC_CHANNEL_Tstat0);
     tstat1 = adcSample(ADC_CHANNEL_Tstat1);
 
-    heat1stFloor = tstat0 > 256 * 15/16;
-    heat2ndFloor = tstat1 > 256 * 15/16;
-
-    if (time_elapsed_sec(t0HeatBoost) > (60-5)) {
-      if (heatBoost1stFloorMinutes) heatBoost1stFloorMinutes--;
-      if (heatBoost2ndFloorMinutes) heatBoost2ndFloorMinutes--;
-      t0HeatBoost = time_get();
+#ifdef DEBUG_TSTAT
+    {
+      char s[48];
+      sprintf(s,"d: Tstat{0,1} = %d, %d\n",tstat0,tstat1);
+      debug_puts(s);
     }
-
-    if (!heatBoost1stFloorMinutes)
-      heat1stFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_1stFloor] == TEMPERATURE_UNKNOWN)
-      heat1stFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_1stFloor] > (((double)heatBoost1stFloorTargetTemp) + 1.5)  ) 
-      heat1stFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_1stFloor] < ((double)heatBoost1stFloorTargetTemp)  ) 
-      heat1stFloorBoost = 1;
-
-    if (!heatBoost2ndFloorMinutes) 
-      heat2ndFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_2ndFloor] == TEMPERATURE_UNKNOWN) 
-      heat2ndFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_2ndFloor] > (((double)heatBoost2ndFloorTargetTemp) + 1.5)  )
-      heat2ndFloorBoost = 0;
-    else if (gTemperature[TEMPERATURE_2ndFloor] < ((double)heatBoost2ndFloorTargetTemp)  )
-      heat2ndFloorBoost = 1;   
-
-    if (heat1stFloorBoost)
-      relayOn(RELAY_heat1stFloorBoost);
-    else
-      relayOff(RELAY_heat1stFloorBoost);
-
-    if (heat2ndFloorBoost)
-      relayOn(RELAY_heat2ndFloorBoost);
-    else
-      relayOff(RELAY_heat2ndFloorBoost);
+#endif
+    
+    // don't know why these are not balanced ..
+    heat1stFloor = tstat0 < 128;
+    heat2ndFloor = tstat1 < 224;
 
     t0 = time_get();
 
@@ -246,7 +211,6 @@ static void control_houseHeat(void)
 
 }
 
-#endif
 
 double Vmain,Vpv;
 unsigned upTime;

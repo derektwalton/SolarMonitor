@@ -91,10 +91,10 @@ struct {
     { "Troot", DATATYPE_double, "%.1lf" },
     { "Tstat_lake_1st_T", DATATYPE_double, "%.1lf" },
     { "Tstat_lake_1st_Tsetpoint", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_1st_fan", DATATYPE_double, "%.1lf" },
+    { "H1st", DATATYPE_double, "%.1lf" },
     { "Tstat_lake_2nd_T", DATATYPE_double, "%.1lf" },
     { "Tstat_lake_2nd_Tsetpoint", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_2nd_fan", DATATYPE_double, "%.1lf" },
+    { "H2nd", DATATYPE_double, "%.1lf" },
     { "Tstat_condo_T", DATATYPE_double, "%.1lf" },
     { "Tstat_condo_Tsetpoint", DATATYPE_double, "%.1lf" },
     { "Tstat_condo_fan", DATATYPE_double, "%.1lf" },
@@ -290,6 +290,8 @@ static void get_radiant(void)
   recordValue("THotO", radiant.THotO, !radiant_isUnknown(radiant.THotO));
   recordValue("TRadR", radiant.TRadR, !radiant_isUnknown(radiant.TRadR));
   recordValue("THTbR", radiant.THTbR, !radiant_isUnknown(radiant.THTbR));
+  recordValue("H1st", radiant.H1st, !radiant_isUnknown(radiant.H1st));
+  recordValue("H2nd", radiant.H1st, !radiant_isUnknown(radiant.H2nd));
   recordValue("circSolar", radiant.thermal_pump, !radiant_isUnknown(radiant.thermal_pump));
   recordValue("circRadiant", radiant.circulatorRadiant, !radiant_isUnknown(radiant.circulatorRadiant));
   recordValue("circHTub", radiant.circulatorHTub, !radiant_isUnknown(radiant.circulatorHTub));
@@ -306,11 +308,11 @@ static void get_honeywell(void)
 
   recordValue("Tstat_lake_1st_T", honeywell.lake_1st_T, !honeywell_isUnknown(honeywell.lake_1st_T));
   recordValue("Tstat_lake_1st_Tsetpoint", honeywell.lake_1st_Tsetpoint, !honeywell_isUnknown(honeywell.lake_1st_Tsetpoint));
-  recordValue("Tstat_lake_1st_fan", honeywell.lake_1st_fan, !honeywell_isUnknown(honeywell.lake_1st_fan));
+  //recordValue("Tstat_lake_1st_fan", honeywell.lake_1st_fan, !honeywell_isUnknown(honeywell.lake_1st_fan));
 
   recordValue("Tstat_lake_2nd_T", honeywell.lake_2nd_T, !honeywell_isUnknown(honeywell.lake_2nd_T));
   recordValue("Tstat_lake_2nd_Tsetpoint", honeywell.lake_2nd_Tsetpoint, !honeywell_isUnknown(honeywell.lake_2nd_Tsetpoint));
-  recordValue("Tstat_lake_2nd_fan", honeywell.lake_2nd_fan, !honeywell_isUnknown(honeywell.lake_2nd_fan));
+  //recordValue("Tstat_lake_2nd_fan", honeywell.lake_2nd_fan, !honeywell_isUnknown(honeywell.lake_2nd_fan));
 }
 #endif
 

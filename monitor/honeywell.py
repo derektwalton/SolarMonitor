@@ -168,8 +168,8 @@ def get_login():
     #print r3.status, r3.reason
     rawdata=r3.read()
     j = json.loads(rawdata)
-    print "1st R3 Dump"
-    print json.dumps(j,indent=2)
+    #print "1st R3 Dump"
+    #print json.dumps(j,indent=2)
     #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
     #print "Success:",j['success']
     #print "Live",j['deviceLive']
@@ -178,9 +178,9 @@ def get_login():
     #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
     print "1st Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
     #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
-    print "1st Status Cool:",j['latestData']['uiData']["StatusCool"]
-    print "1st Status Heat:",j['latestData']['uiData']["StatusHeat"]
-    print "1st Status Fan:",j['latestData']['fanData']["fanMode"]
+    #print "1st Status Cool:",j['latestData']['uiData']["StatusCool"]
+    #print "1st Status Heat:",j['latestData']['uiData']["StatusHeat"]
+    #print "1st Status Fan:",j['latestData']['fanData']["fanMode"]
     print "1st fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
     
 
@@ -222,8 +222,8 @@ def get_login():
     #print r3.status, r3.reason
     rawdata=r3.read()
     j = json.loads(rawdata)
-    print "2nd R3 Dump"
-    print json.dumps(j,indent=2)
+    #print "2nd R3 Dump"
+    #print json.dumps(j,indent=2)
     #print json.dumps(j,sort_keys=True,indent=4, separators=(',', ': '))
     #print "Success:",j['success']
     #print "Live",j['deviceLive']
@@ -232,9 +232,9 @@ def get_login():
     #print "Cool Setpoint:",j['latestData']['uiData']["CoolSetpoint"]
     print "2nd Heat Setpoint:",j['latestData']['uiData']["HeatSetpoint"]
     #print "Hold Until :",j['latestData']['uiData']["TemporaryHoldUntilTime"]
-    print "2nd Status Cool:",j['latestData']['uiData']["StatusCool"]
-    print "2nd Status Heat:",j['latestData']['uiData']["StatusHeat"]
-    print "2nd Status Fan:",j['latestData']['fanData']["fanMode"]
+    #print "2nd Status Cool:",j['latestData']['uiData']["StatusCool"]
+    #print "2nd Status Heat:",j['latestData']['uiData']["StatusHeat"]
+    #print "2nd Status Fan:",j['latestData']['fanData']["fanMode"]
     print "2nd fanIsRunning:",j['latestData']['fanData']["fanIsRunning"]
     
     logout(headers)

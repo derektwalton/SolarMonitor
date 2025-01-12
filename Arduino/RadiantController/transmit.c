@@ -137,8 +137,8 @@ void transmit(void)
       sprintf(s+strlen(s),"%s ",circulatorHotTub ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",0 ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",finnedTubeDump ? " ON " : " .  ");
-      sprintf(s+strlen(s),"%s ",heat1stFloorBoost ? " ON " : " .  ");
-      sprintf(s+strlen(s),"%s ",heat2ndFloorBoost ? " ON " : " .  ");
+      sprintf(s+strlen(s),"%s "," .  "); // heat1stFloorBoost
+      sprintf(s+strlen(s),"%s "," .  "); // head2ndFloorBoost
       
       t = gTemperature[TEMPERATURE_RootCellar];
       ss = s+strlen(s);

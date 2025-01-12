@@ -7,7 +7,7 @@
 #include "led.h"
 #include "thermal.h"
 
-//#define THERMAL_DEBUG
+#define THERMAL_DEBUG
 
 volatile int rxdone = 0;
 
