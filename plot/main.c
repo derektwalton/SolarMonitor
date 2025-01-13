@@ -64,9 +64,6 @@ MERGE_t merge[] =
     { "Tstat_2nd", DATATYPE_double },
     { "Tstat_lake_2nd_Tsetpoint", DATATYPE_double },
     { "H2nd", DATATYPE_double },
-    { "Tcondo", DATATYPE_double },
-    { "Tstat_condo_Tsetpoint", DATATYPE_double },
-    { "Hcondo", DATATYPE_double },
     // added 4/27/2018
     { "Tsoil", DATATYPE_double },
     { "Tambient", DATATYPE_double },
@@ -142,8 +139,6 @@ OUTPUT_t output_summary4up[] =
     { "PVacEnergy", DATATYPE_double, "%.1lf" },
     { "HeatFraction", DATATYPE_double, "%.2lf" },
     { "Troot", DATATYPE_double, "%.1lf" },
-    { "Tcondo", DATATYPE_double, "%.1lf" },
-    { "Hcondo", DATATYPE_boolean, "%d" },
   };
 
 #define OUTPUT_SUMMARY4UP_PVacEnergy        (19)
@@ -212,8 +207,6 @@ OUTPUT_t output_rawdata[] =
     { "PVacEnergy", DATATYPE_double, "%.1lf" },
     { "HeatFraction", DATATYPE_double, "%.2lf" },
     { "Troot", DATATYPE_double, "%.1lf" },
-    { "Tcondo", DATATYPE_double, "%.1lf" },
-    { "Hcondo", DATATYPE_boolean, "%d" },
   };
 
 typedef enum {

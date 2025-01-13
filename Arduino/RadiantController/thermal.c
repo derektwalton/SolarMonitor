@@ -130,6 +130,7 @@ static int parseLine(char *s)
     failCount = 0; 
 
 #ifdef THERMAL_DEBUG
+#if 0
   debug_puts("d: thermal summary:\n");
   if (thermal.flags & THERMAL_FLAGS_commLinkDown) debug_puts("d: FLAGS_commLinkDown\n");
   if (thermal.flags & THERMAL_FLAGS_missingField) debug_puts("d: FLAGS_missingField\n");
@@ -153,6 +154,7 @@ static int parseLine(char *s)
       debug_puts(s);
     }
   }
+#endif
 #endif
   
   return(failCount);

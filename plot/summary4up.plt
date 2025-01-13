@@ -14,10 +14,8 @@ plot 'out.txt' using 1:(column("T1st")-3) with lines, \
      '' using 1:(column("Troot")-3) with lines, \
      '' using 1:'Tbas' with lines, \
      '' using 1:'Tout' with lines, \
-     '' using 1:'Tcondo' with lines, \
      '' using 1:(3+3*(column("H1st"))) with lines, \
-     '' using 1:(9+3*(column("H2nd"))) with lines, \
-     '' using 1:(15+3*(column("Hcondo"))) with lines
+     '' using 1:(9+3*(column("H2nd"))) with lines
 unset label 2
 set yrange [0:250]
 set ylabel 'Degrees F'
