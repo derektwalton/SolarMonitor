@@ -94,8 +94,12 @@ MERGE_t merge[] =
     { "smoke", DATATYPE_boolean },
 };
 
+#define MERGEINDEX_T1ST        (0)
+#define MERGEINDEX_T2ND        (1)
 #define MERGEINDEX_TOUT        (3)
+#define MERGEINDEX_TSTAT_1ST   (20)
 #define MERGEINDEX_H1ST        (22)
+#define MERGEINDEX_TSTAT_2ND   (23)
 #define MERGEINDEX_H2ND        (25)
 #define MERGEINDEX_H1STorH2ND  (10000)
 
@@ -544,10 +548,7 @@ int ring_get_timeperiod_info
     if (previous && previous->time >= thruTime)
       break;
 
-    if (mergeIndex != MERGEINDEX_H1STorH2ND) {
-      currentValue = current->value[mergeIndex];
-      currentValuePresent = current->valuePresent[mergeIndex];
-    } else {
+    if (mergeIndex == MERGEINDEX_H1STorH2ND) {
       currentValue = 0.0;
       currentValuePresent = 0;
       if (current->valuePresent[MERGEINDEX_H1ST]) {
@@ -558,6 +559,23 @@ int ring_get_timeperiod_info
 	if (current->value[MERGEINDEX_H2ND]==1.0) currentValue = 1.0;
 	currentValuePresent = 1;
       }
+    } else if (mergeIndex == MERGEINDEX_T1ST) {
+      currentValue = current->value[MERGEINDEX_T1ST];
+      currentValuePresent = current->valuePresent[MERGEINDEX_T1ST];
+      if (!currentValuePresent) {
+	currentValue = current->value[MERGEINDEX_TSTAT_1ST];
+	currentValuePresent = current->valuePresent[MERGEINDEX_TSTAT_1ST];
+      }
+    } else if (mergeIndex == MERGEINDEX_T2ND) {
+      currentValue = current->value[MERGEINDEX_T2ND];
+      currentValuePresent = current->valuePresent[MERGEINDEX_T2ND];
+      if (!currentValuePresent) {
+	currentValue = current->value[MERGEINDEX_TSTAT_2ND];
+	currentValuePresent = current->valuePresent[MERGEINDEX_TSTAT_2ND];
+      }
+    } else {
+      currentValue = current->value[mergeIndex];
+      currentValuePresent = current->valuePresent[mergeIndex];
     }
 
     if (!currentValuePresent)
@@ -628,6 +646,14 @@ int ring_get_output_record(RING_t *ring, OUTPUT_SELECT_t *output_select)
       if (j!=-1) {
 	output_select->output[i].valuePresent = record->valuePresent[j];
 	output_select->output[i].value = record->value[j];
+	if (j == MERGEINDEX_T1ST && !output_select->output[i].valuePresent) {
+	  output_select->output[i].value = record->value[MERGEINDEX_TSTAT_1ST];
+	  output_select->output[i].valuePresent = record->valuePresent[MERGEINDEX_TSTAT_1ST];
+	}
+	if (j == MERGEINDEX_T2ND && !output_select->output[i].valuePresent) {
+	  output_select->output[i].value = record->value[MERGEINDEX_TSTAT_2ND];
+	  output_select->output[i].valuePresent = record->valuePresent[MERGEINDEX_TSTAT_2ND];
+	}
       }
     }
 #else
