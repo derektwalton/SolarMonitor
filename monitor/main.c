@@ -18,7 +18,7 @@
 #include "growroom.h"
 #include "greenhouse.h"
 
-#define ENABLE_PV 0
+#define ENABLE_PV 1
 #define ENABLE_RADIANT 1
 #define ENABLE_GROWROOM 0
 #define ENABLE_GROWROOM_EXT 0
@@ -69,64 +69,64 @@ struct {
   double value;
 } samples[] =
   {
-    { "T1st", DATATYPE_double, "%.1lf" },
-    { "T2nd", DATATYPE_double, "%.1lf" },
-    { "Tbas", DATATYPE_double, "%.1lf" },
-    { "Tout", DATATYPE_double, "%.1lf" },
-    { "Tcoll", DATATYPE_double, "%.1lf" },
+    { "T1st", DATATYPE_double, "%.1lf", 0 },
+    { "T2nd", DATATYPE_double, "%.1lf", 0 },
+    { "Tbas", DATATYPE_double, "%.1lf", 0 },
+    { "Tout", DATATYPE_double, "%.1lf", 0 },
+    { "Tcoll", DATATYPE_double, "%.1lf", 0 },
     { "Tstor", DATATYPE_double, "%.1lf" },
-    { "TXchI", DATATYPE_double, "%.1lf" },
-    { "TXchM", DATATYPE_double, "%.1lf" },
-    { "TXchO", DATATYPE_double, "%.1lf" },
-    { "THotO", DATATYPE_double, "%.1lf" },
-    { "TRadR", DATATYPE_double, "%.1lf" },
-    { "THTbR", DATATYPE_double, "%.1lf" },
-    { "circSolar", DATATYPE_boolean, "%d" },
-    { "circRadiant", DATATYPE_boolean, "%d" },
-    { "circHTub", DATATYPE_boolean, "%d" },
-    { "finnedDump", DATATYPE_boolean, "%d" },
-    { "PVacPower", DATATYPE_double, "%.0lf" },
-    { "PVacEnergy", DATATYPE_double, "%.1lf" },
-    { "Thottub", DATATYPE_double, "%.1lf" },
-    { "Troot", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_1st_T", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_1st_Tsetpoint", DATATYPE_double, "%.1lf" },
-    { "H1st", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_2nd_T", DATATYPE_double, "%.1lf" },
-    { "Tstat_lake_2nd_Tsetpoint", DATATYPE_double, "%.1lf" },
-    { "H2nd", DATATYPE_double, "%.1lf" },
+    { "TXchI", DATATYPE_double, "%.1lf", 0 },
+    { "TXchM", DATATYPE_double, "%.1lf", 0 },
+    { "TXchO", DATATYPE_double, "%.1lf", 0 },
+    { "THotO", DATATYPE_double, "%.1lf", 0 },
+    { "TRadR", DATATYPE_double, "%.1lf", 0 },
+    { "THTbR", DATATYPE_double, "%.1lf", 0 },
+    { "circSolar", DATATYPE_boolean, "%d", 0 },
+    { "circRadiant", DATATYPE_boolean, "%d", 0 },
+    { "circHTub", DATATYPE_boolean, "%d", 0 },
+    { "finnedDump", DATATYPE_boolean, "%d", 0 },
+    { "PVacPower", DATATYPE_double, "%.0lf", 0 },
+    { "PVacEnergy", DATATYPE_double, "%.1lf", 0 },
+    { "Thottub", DATATYPE_double, "%.1lf", 0 },
+    { "Troot", DATATYPE_double, "%.1lf", 0 },
+    { "Tstat_lake_1st_T", DATATYPE_double, "%.1lf", 0 },
+    { "Tstat_lake_1st_Tsetpoint", DATATYPE_double, "%.1lf", 0 },
+    { "H1st", DATATYPE_double, "%.1lf", 0 },
+    { "Tstat_lake_2nd_T", DATATYPE_double, "%.1lf", 0 },
+    { "Tstat_lake_2nd_Tsetpoint", DATATYPE_double, "%.1lf", 0 },
+    { "H2nd", DATATYPE_double, "%.1lf", 0 },
 #if ENABLE_GROWROOM
     // seedling grow room
-    { "grow_soil_T", DATATYPE_double, "%.1lf" },
-    { "grow_ambient_T", DATATYPE_double, "%.1lf" },
-    { "grow_ambient_humidity", DATATYPE_double, "%.1lf" },
-    { "grow_soil_heat", DATATYPE_boolean, "%d" },
-    { "grow_room_heat", DATATYPE_boolean, "%d" },
-    { "grow_light", DATATYPE_boolean, "%d" },
-    { "grow_fan", DATATYPE_boolean, "%d" },
+    { "grow_soil_T", DATATYPE_double, "%.1lf", 0 },
+    { "grow_ambient_T", DATATYPE_double, "%.1lf", 0 },
+    { "grow_ambient_humidity", DATATYPE_double, "%.1lf", 0 },
+    { "grow_soil_heat", DATATYPE_boolean, "%d", 0 },
+    { "grow_room_heat", DATATYPE_boolean, "%d", 0 },
+    { "grow_light", DATATYPE_boolean, "%d", 0 },
+    { "grow_fan", DATATYPE_boolean, "%d", 0 },
 #endif
 #if ENABLE_GREENHOUSE
     // greenhouse
-    { "greenhouse_ambient_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_ambient_humidity", DATATYPE_double, "%.1lf" },
-    { "greenhouse_gnd13_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_gnd3_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_pool_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_panel_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_inner_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_out_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_spare1_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_spare2_T", DATATYPE_double, "%.1lf" },
-    { "greenhouse_pump", DATATYPE_int, "%d" },
-    { "greenhouse_fan", DATATYPE_boolean, "%d" },
-    { "greenhouse_dehumidifer", DATATYPE_boolean, "%d" },
-    { "greenhouse_control3", DATATYPE_boolean, "%d" },
+    { "greenhouse_ambient_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_ambient_humidity", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_gnd13_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_gnd3_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_pool_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_panel_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_inner_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_out_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_spare1_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_spare2_T", DATATYPE_double, "%.1lf", 0 },
+    { "greenhouse_pump", DATATYPE_int, "%d", 0 },
+    { "greenhouse_fan", DATATYPE_boolean, "%d", 0 },
+    { "greenhouse_dehumidifer", DATATYPE_boolean, "%d", 0 },
+    { "greenhouse_control3", DATATYPE_boolean, "%d", 0 },
 #endif
 #if ENABLE_GROWROOM_EXT
     // seedling grow room extended
-    { "grow_ambient_T2", DATATYPE_double, "%.1lf" },
-    { "grow_ambient_humidity2", DATATYPE_double, "%.1lf" },
-    { "grow_smoke", DATATYPE_boolean, "%d" },
+    { "grow_ambient_T2", DATATYPE_double, "%.1lf", 0 },
+    { "grow_ambient_humidity2", DATATYPE_double, "%.1lf", 0 },
+    { "grow_smoke", DATATYPE_boolean, "%d", 0 },
 #endif
   };
 
@@ -177,6 +177,8 @@ int log_fileset_fputs(LOG_FILESET_t *fs, time_t *rawtime, char *ss)
   iso8601_datetime_set(s, tm_time);
   fprintf(fs->fp,"%s%s",s,ss);
   fflush(fs->fp);
+
+  printf("l: %s%s",s,ss);
 }
 
 int log_fileset_fopen(LOG_FILESET_t *fs, char *prefix, char *suffix)
@@ -213,7 +215,7 @@ int put_record(LOG_FILESET_t *fs)
     count--;
   }
 #endif
-  
+
   s[0]=0;
   for(i=0;i<sizeof(samples)/sizeof(samples[0]);i++) {
     sprintf(s+strlen(s),",");
@@ -236,7 +238,7 @@ int put_record(LOG_FILESET_t *fs)
 
   time(&rawtime);
   log_fileset_fputs(fs,&rawtime,s);
-  
+
   return 0;
 }
 
@@ -368,13 +370,13 @@ static void get_greenhouse(void)
 }
 #endif
 
-static void get_ttyUSB ( char *prolific,
+static void get_ttyUSB ( char *inverter,
 			 char *arduino )
 {
   FILE *fp;
   char s[128],*ss;
 
-  *prolific = 0;
+  *inverter = 0;
   *arduino = 0;
   
   fp = popen("./ttyUSBx","r");
@@ -382,7 +384,11 @@ static void get_ttyUSB ( char *prolific,
     while(fgets(s,sizeof(s),fp)) {
       if (strstr(s," - Prolific")) {
 	*strstr(s," - Prolific") = 0;
-	strcpy(prolific,s);
+	strcpy(inverter,s);
+      }
+      if (strstr(s," - FTDI_USB_Serial_Converter_FTE1JHMJ")) {
+	*strstr(s," - FTDI_USB_Serial_Converter_FTE1JHMJ") = 0;
+	strcpy(inverter,s);
       }
       if (strstr(s," - Gravitech_ARDUINO")) {
 	*strstr(s," - Gravitech_ARDUINO") = 0;
@@ -407,7 +413,7 @@ main()
   time_t t0,t1;
   struct tm *tm_time;
   LOG_FILESET_t fs;
-  char prolific[32];
+  char inverter[32];
   char arduino[32];
   
 #if 0
@@ -456,7 +462,7 @@ main()
     samples[i].valuePresent = 0;
   }    
 
-  get_ttyUSB (prolific,arduino);
+  get_ttyUSB (inverter,arduino);
   
 #if ENABLE_RADIANT
   err = radiant_start(arduino);
@@ -473,7 +479,7 @@ main()
 #endif
   
 #if ENABLE_PV
-  err = pv_start(prolific);
+  err = pv_start(inverter);
   if (err) {
     printf("pv_start() fail\n");
   }
