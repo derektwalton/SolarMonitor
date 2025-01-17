@@ -56,10 +56,17 @@ void time_init(void)
   // Create a near 1 mSec system timer tick and 100 usec subtick
   //
   // Use fast PWM mode with TOP = OCR2A in order to create a TOV2 interrupt
-  // every 1 mSec..  This is mode WGM0[2:0] = 7.  Set clock select = 3 for 
+  // every 100 uSec.  This is mode WGM0[2:0] = 7.  Set clock select = 3 for 
   // CLKio / 64.
 
+#if 0
   OCR2A = (F_CPU / 10000) / 64;  // 25 for 16MHz system clock
+#else
+  // 1/17/2025
+  // For some reason I needed to change this for the Chinese knock-off Nanos
+  // in order to get the correct sampling rate.
+  OCR2A = (F_CPU /  5000) / 64;
+#endif
   TIMSK2 = _BV(TOIE0);  // set overflow interrupt enable
   TCCR2A = 
     (3 << WGM00); // WGM0[1:0] = b11

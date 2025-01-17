@@ -7,7 +7,8 @@
 #include "led.h"
 #include "thermal.h"
 
-#define THERMAL_DEBUG
+//#define DISABLE_THERMAL
+//#define DEBUG_THERMAL
 
 volatile int rxdone = 0;
 
@@ -129,7 +130,7 @@ static int parseLine(char *s)
 	  THERMAL_FLAGS_notUnderstood)) )
     failCount = 0; 
 
-#ifdef THERMAL_DEBUG
+#ifdef DEBUG_THERMAL
 #if 0
   debug_puts("d: thermal summary:\n");
   if (thermal.flags & THERMAL_FLAGS_commLinkDown) debug_puts("d: FLAGS_commLinkDown\n");
@@ -167,9 +168,10 @@ void thermal_poll(void)
   static long t0;
   static int timeoutCount = 0;
 
+#ifndef DISABLE_THERMAL
   if (needsInit || rxdone) {
     if (!needsInit) {
-#ifdef THERMAL_DEBUG
+#ifdef DEBUG_THERMAL
       debug_puts("d: thermal recv ");
       debug_puts(s);
 #endif
@@ -209,5 +211,6 @@ void thermal_poll(void)
   } else {
     ledOn(LED_THERMAL_STATUS_OK);
   }
-
+#endif
+  
 }

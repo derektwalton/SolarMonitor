@@ -5,6 +5,8 @@
 
 #include "f007th.h"
 
+//#define DEBUG_F007TH
+
 #define SAMPLE_BYTES 128
 static uint8_t sample_buffer[SAMPLE_BYTES];
 static uint8_t sample_wrPtr, sample_wrPtr_bit;
@@ -26,6 +28,9 @@ void f007th_poll(void)
     initComplete = 1;
   } else {
     uint8_t n = sample_wrPtr - sample_rdPtr;
+#ifdef DEBUG_F007TH
+    if (n>128) debug_puts("f: overflow\n");
+#endif
     while (n) {
       processStream(sample_buffer[ sample_rdPtr & (SAMPLE_BYTES-1) ]);
       sample_rdPtr ++;
@@ -419,6 +424,10 @@ typedef enum {
 
 static STATE_t state;
 
+#ifdef DEBUG_F007TH
+static char dbg_s[64+5], *dbg_ss; // +5 for "r: \n\0"
+#endif
+
 static void processStream(uint8_t d)
 {
   uint8_t max_position;
@@ -432,6 +441,47 @@ static void processStream(uint8_t d)
   }
   sbuf_bits += 8;
 
+#if 0
+
+  // This section of code can be enabled to capture raw samples from the 433MHz receiver and
+  // forward them out the Nano UART, thru the USB to serial converter, to the host.  However,
+  // in order to do so a few system changes are required to provided adequate bandwidth.
+  // These changes are:
+  //
+  // (1) Change UART BAUD_RATE in uart.c to 57600.  Since this single UART is used to
+  //     both RX from the thermal controller and TX to the host, changing the rate away
+  //     from the 2400 used by the thermal controller will bring this link down.
+  //
+  // (2) In thermal.c, define DISABLE_THERMAL to stop thermal communication.
+  //
+  // (3) In transmit.c, define DISABLE_TRANSMIT to stop data link to host.  Now we will just
+  //     have raw 433MHz data to the host.
+  //
+  // (4) If needed, disable debug printing by removing and defines of the form DEBUG_*.
+  //
+  
+  while (sbuf_bits >= 10) {
+    uint8_t c;
+    c = sbuf_d & 0x1f;
+    c += (c<16) ? 'a' : ('A' - 16);
+    *dbg_ss++ = c;
+    SBUF_ADVANCE(5);
+    c = sbuf_d & 0x1f;
+    c += (c<16) ? 'a' : ('A' - 16);
+    *dbg_ss++ = c;
+    SBUF_ADVANCE(5);
+    *dbg_ss = 0;
+    if (strlen(dbg_s)==64+3) {
+      *dbg_ss++='\n';
+      *dbg_ss=0;
+      debug_puts(dbg_s);
+      dbg_s[3] = 0;
+      dbg_ss = &dbg_s[3];
+    }
+  }
+
+#else
+  
   //
   // keep on processing the stream while we have enough sample bits to perform transition detection
   //
@@ -483,31 +533,70 @@ static void processStream(uint8_t d)
 	if (e>ENERGY_THRESHOLD) {
 	  // found "1", increment header bit count
 	  nHeaderBits++;
+#ifdef DEBUG_F007TH
+	  *dbg_ss++='h';
+	  *dbg_ss=0;
+#endif
 	  SBUF_ADVANCE(SAMPLES_PER_BIT-1+max_position);
 	} else if (e<-ENERGY_THRESHOLD && nHeaderBits>HEADER_BITS) {
 	  // found "0" after a header
 	  packetBits = -1;
 	  SBUF_ADVANCE(SAMPLES_PER_BIT-1+max_position);
 	  state = STATE_packet;
+#ifdef DEBUG_F007TH
+	  *dbg_ss++='p';
+	  *dbg_ss=0;
+#endif
 	} else {
 	  // no transition or not enough header bits ... go back to search
 	  state = STATE_search;
+#ifdef DEBUG_F007TH
+	  if (strlen(dbg_s)>4) {
+	    *dbg_ss++='\n';
+	    *dbg_ss=0;
+	    debug_puts(dbg_s);
+	  }
+	  dbg_s[3] = 0;
+	  dbg_ss = &dbg_s[3];
+#endif
 	}
 	break;
 
       case STATE_packet:
 	if (e>ENERGY_THRESHOLD || e<-ENERGY_THRESHOLD) {
-	  if (packetBits>=0)
+	  if (packetBits>=0) {
 	    packet[packetBits/8] = (packet[packetBits/8]<<1) | (e>0 ? 1 : 0);
+#ifdef DEBUG_F007TH
+	    *dbg_ss++=e>0 ? '1' : '0';
+	    *dbg_ss=0;
+#endif
+	  }
 	  packetBits++;
 	  SBUF_ADVANCE(SAMPLES_PER_BIT-1+max_position);
 	  if (packetBits==PACKET_BYTES*8) {
+#ifdef DEBUG_F007TH
+	    *dbg_ss++='E';
+	    *dbg_ss++='\n';
+	    *dbg_ss=0;
+	    debug_puts(dbg_s);
+	    dbg_s[3] = 0;
+	    dbg_ss = &dbg_s[3];;
+#endif
 	    record_sensor_data(); 
 	    state = STATE_search;
 	  }
 	} else {
 	  // no transition or not enough header bits ... go back to search
 	  state = STATE_search;
+#ifdef DEBUG_F007TH
+	  if (strlen(dbg_s)>4) {
+	    *dbg_ss++='\n';
+	    *dbg_ss=0;
+	    debug_puts(dbg_s);
+	  }
+	  dbg_s[3] = 0;
+	  dbg_ss = &dbg_s[3];
+#endif
 	}
 	break;
 
@@ -518,12 +607,20 @@ static void processStream(uint8_t d)
       break;
     }
   }
+#endif
 }
 
 static void init(void)
 {
   sbuf_bits = 0;
   state = STATE_search;
+#ifdef DEBUG_F007TH
+  dbg_s[0] = 'f';
+  dbg_s[1] = ':';
+  dbg_s[2] = ' ';
+  dbg_s[3] = 0;
+  dbg_ss = &dbg_s[3];
+#endif
 }
 
 #endif

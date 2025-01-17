@@ -9,6 +9,8 @@
 #include "temperature.h"
 #include "switch.h"
 
+//#define DISABLE_TRANSMIT
+
 static volatile int txdone = 1;
 
 static void txcb(void)
@@ -16,7 +18,8 @@ static void txcb(void)
   txdone = 1;
 }
 
-#define HEADER_INTERVAL 20 // header every 20 lines
+#define TRANSMIT_INTERVAL  5 // 5 sec
+#define HEADER_INTERVAL   20 // header every 20 lines
 
 static char header0[] = "r: // Uptime    |    Thermal Controller Outputs    |                          Radiant Controller Inputs                            |     Switches      |     Controller Outputs      | Extra |";
 static char header1[] = "r: // d:h:m:s    CollT  StorT  Aux1T  Aux2T Pmp UpL  Vac  Vpv T1st  T2nd  Tbas  Tout  TXchI TXchM TXchO THotO TRadR THTbR H1st H2nd Away HTub Sw3  Sw4  Radt HTub AuxF FDmp B1st B2nd  Troot  ";
@@ -31,7 +34,8 @@ void transmit(void)
   double t;
   char *ss;
 
-  if (txdone && time_elapsed_mSec(t0)>2000) {
+#ifndef DISABLE_TRANSMIT
+  if (txdone && time_elapsed_mSec(t0)>(TRANSMIT_INTERVAL * 1000)) {
     switch(state) {
 
     case 0:
@@ -161,4 +165,5 @@ void transmit(void)
 
     }
   }
+#endif
 }
