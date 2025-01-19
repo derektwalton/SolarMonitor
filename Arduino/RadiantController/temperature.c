@@ -39,7 +39,7 @@ TEMP_SENSOR_t sensors[] =
 #endif
   { TEMPERATURE_Basement,      { 0x28, 0xf9, 0x26, 0xec, 0x02, 0x00, 0x00, 0x8a }, 1, MAX_FAIL_COUNT },
   { TEMPERATURE_Outside,       { 0x28, 0x92, 0x2b, 0xec, 0x02, 0x00, 0x00, 0x5d }, 1, MAX_FAIL_COUNT },
-  { TEMPERATURE_GlycolExchIn,  { 0x28, 0xc2, 0x37, 0xec, 0x02, 0x00, 0x00, 0x2e }, 1, MAX_FAIL_COUNT },
+  { TEMPERATURE_GlycolExchIn,  { 0x22, 0x54, 0x80, 0x24, 0x00, 0x00, 0x00, 0xd2 }, 1, MAX_FAIL_COUNT },
   { TEMPERATURE_GlycolExchMid, { 0x28, 0xe8, 0x1c, 0xec, 0x02, 0x00, 0x00, 0xdf }, 1, MAX_FAIL_COUNT },
   { TEMPERATURE_GlycolExchOut, { 0x22, 0xb7, 0x8c, 0x24, 0x00, 0x00, 0x00, 0x83 }, 1, MAX_FAIL_COUNT },
   { TEMPERATURE_TankHotOut,    { 0x28, 0x2e, 0x38, 0xec, 0x02, 0x00, 0x00, 0x15 }, 1, MAX_FAIL_COUNT },
@@ -64,10 +64,10 @@ static int temperature_onewire_Init(void)
 {
   setUnknown_onewire();
 
-#if ONEWIRE_SEARCH_ENABLE
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
   {
     int i;
-	for(i=0;i<NSENSORS;i++)
+    for(i=0;i<NSENSORS;i++)
       sensors[i].foundIt = 0;
   }
 #endif
@@ -83,16 +83,13 @@ static int temperature_onewire_Init(void)
     return FAIL;
   }
     
-#if ONEWIRE_SEARCH_ENABLE
+#ifdef DEBUG_TEMPERATURE_ONEWIRE
     
   {
     unsigned char addr[8];
-    int j,match;
+    int i,j,match;
     
-    for(i=0;i<NSENSORS;i++)
-      sensors[i].foundIt = 0;
-    
-    //dc_log_printf("finding temp sensors...");
+    debug_puts("d: finding onewire temp sensors:\n");
     while(onewire_search(addr)) {
       for(i=0;i<NSENSORS;i++) {
 	if (sensors[i].foundIt) continue;
@@ -105,23 +102,26 @@ static int temperature_onewire_Init(void)
 	}
 	if (!match) continue;
 	sensors[i].foundIt = 1;
-	//dc_log_printf("found sensor %s",sensors[i].name);
+	{
+	  char s[64];
+	  sprintf(s,"d:  found sensor %d\n",sensors[i].location);
+	  debug_puts(s);
+	}
 	break;
       }
-#if 0
       if (!match) {
-	dc_log_printf("unknown sensor:");
-	dc_log_printf(" %0.2x%0.2x%0.2x%0.2x %0.2x%0.2x%0.2x%0.2x",
-		      addr[0],
-		      addr[1],
-		      addr[2],
-		      addr[3],
-		      addr[4],
-		      addr[5],
-		      addr[6],
-		      addr[7]);
+	char s[64];
+	sprintf(s,"unknown sensor %0.2x%0.2x%0.2x%0.2x %0.2x%0.2x%0.2x%0.2x\n",
+		addr[0],
+		addr[1],
+		addr[2],
+		addr[3],
+		addr[4],
+		addr[5],
+		addr[6],
+		addr[7]);
+	debug_puts(s);
       }
-#endif
     }
   }
 #endif

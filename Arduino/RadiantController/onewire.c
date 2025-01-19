@@ -39,9 +39,7 @@ void onewire_init(void)
   DDRD &= ~_BV(PD5); // in
   DDRD |= _BV(PD6);  // out
   DDRD |= _BV(PD2);  // oe
-#if ONEWIRE_SEARCH_ENABLE
   onewire_resetSearch();
-#endif
 }
 
 //
@@ -220,8 +218,6 @@ unsigned char onewire_crc8( unsigned char *d, int len )
   return crc;
 }
 
-#if ONEWIRE_SEARCH_ENABLE
-
 typedef struct {
   int LastDiscrepancy;
   int LastDeviceFlag;
@@ -369,6 +365,3 @@ int onewire_search(unsigned char *addr)
 
   return search_result;
 }
-
-#endif
-
