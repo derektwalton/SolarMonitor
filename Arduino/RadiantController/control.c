@@ -33,7 +33,7 @@ Inputs:
 thermal.collT - thermal collector temperature
 thermal.storT - thermal storage tank temperature
 gTemperature[TEMPERATURE_1stFloor] - inside temperature at 1st floor of house
-switches & SWITCH_away - switch indicating away (no DHW) rather than home (tank for DHW)
+switches & SWITCH_noDHW - switch indicating no water heating (DHW )
 switches & SWITCH_heatHotTub - switch indicating user wants heat to hot tub
 switches & SWITCH_noHeat - switch indicating that don't want any heat into radiant floor
 switches & SWITCH_thermostatHotTub - perform thermostat control for hot tub
@@ -51,7 +51,8 @@ finnedTubeDump - zone valve to divert glycol thru finned tube dump path
 #define THERMAL_DUMP_HI_LIMIT_TANK      (165.0)   // storage temp F above which to dump
 #define THERMAL_2XDUMP_HI_LIMIT_TANK    (170.0)   // storage temp F above which to do 2x dump
 #define THERMAL_DUMP_LO_LIMIT_TANK      (125.0)   // minimum storage temp F for heat extraction
-#define THERMAL_DUMP_RADIANT_THRESHOLD  ( 72.0)   // 1st floor temp below which to dump to radiant
+#define THERMAL_HEAT_CALL_DHW           ( 72.0)   // 1st floor temp below which to dump to radiant when DHW=1
+#define THERMAL_HEAT_CALL_NODHW         ( 78.0)   // 1st floor temp below which to dump to radiant when DHW=0
 #define THERMAL_DUMP_HOTTUB_LO_LIMIT    ( 85.0)   // temperature which indicates hot tub jets on
 #define THERMAL_DUMP_HOTTUB_HI_LIMIT    ( 98.0)   // hot tub temp above which to stop dumping
 
@@ -99,7 +100,7 @@ static void control_thermalDump(void)
       needHeat = 0;
     else
       needHeat =
-	(gTemperature[TEMPERATURE_1stFloor] < THERMAL_DUMP_RADIANT_THRESHOLD) &&
+	(gTemperature[TEMPERATURE_1stFloor] < THERMAL_HEAT_CALL_DHW) &&
 	(thermal.storT > THERMAL_DUMP_LO_LIMIT_TANK);
 
     // determine if need heat, assume that tank is NOT used for domestic hot water.  in
@@ -112,7 +113,7 @@ static void control_thermalDump(void)
       needHeatNoDHW = (thermal.storT > 70.0);
     else
       needHeatNoDHW =
-	(gTemperature[TEMPERATURE_1stFloor] < THERMAL_DUMP_RADIANT_THRESHOLD) &&
+	(gTemperature[TEMPERATURE_1stFloor] < THERMAL_HEAT_CALL_NODHW) &&
 	(thermal.storT > (gTemperature[TEMPERATURE_1stFloor] + 2));
     
 
@@ -129,7 +130,7 @@ static void control_thermalDump(void)
 	(thermal.storT > THERMAL_DUMP_LO_LIMIT_TANK);
 
     doRadiantDump = 
-      ((switches & SWITCH_away) ? needHeatNoDHW : needHeat) ||
+      ((switches & SWITCH_noDHW) ? needHeatNoDHW : needHeat) ||
       (needDump && needHeat) ||
       need2xDump;
     

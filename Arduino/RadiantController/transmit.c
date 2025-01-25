@@ -132,7 +132,7 @@ void transmit(void)
       sprintf(s+strlen(s),"%s ",heat1stFloor ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",heat2ndFloor ? " ON " : " .  ");
       
-      sprintf(s+strlen(s),"%s ",(switches & SWITCH_away) ? " ON " : " .  ");
+      sprintf(s+strlen(s),"%s ",(switches & SWITCH_noDHW) ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",(switches & SWITCH_heatHotTub) ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",(switches & SWITCH_3) ? " ON " : " .  ");
       sprintf(s+strlen(s),"%s ",(switches & SWITCH_4) ? " ON " : " .  ");

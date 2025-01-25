@@ -11,7 +11,7 @@ typedef enum {
   FETSWITCH_2 = 2
 } FETSWITCH_t;
 
-#define CIRCULATOR_Radiant FETSWITCH_0
+#define CIRCULATOR_Radiant FETSWITCH_2
 #define CIRCULATOR_HotTub  FETSWITCH_1
 
 void fetSwitchOn(FETSWITCH_t n);
