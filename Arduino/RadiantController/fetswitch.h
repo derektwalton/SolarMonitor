@@ -13,6 +13,7 @@ typedef enum {
 
 #define CIRCULATOR_Radiant FETSWITCH_2
 #define CIRCULATOR_HotTub  FETSWITCH_1
+#define CIRCULATOR_Solar   FETSWITCH_0
 
 void fetSwitchOn(FETSWITCH_t n);
 void fetSwitchOff(FETSWITCH_t n);

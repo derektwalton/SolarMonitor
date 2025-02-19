@@ -8,7 +8,7 @@
 #include "thermal.h"
 
 //#define DISABLE_THERMAL
-//#define DEBUG_THERMAL
+#define DEBUG_THERMAL
 
 volatile int rxdone = 0;
 

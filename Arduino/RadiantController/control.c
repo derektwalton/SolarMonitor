@@ -213,6 +213,52 @@ static void control_houseHeat(void)
 }
 
 
+/*
+Anti thermal siphon control
+
+It seems that the evauated tub thermal panels are much more prone to thermally driven
+glycol reverse siphon when the hot water tank is hot and the thermal panels are cool.
+We can detect this and attempt to neutralize it.
+
+*/
+
+#define ANTI_SIPHON_PULSE_LENGTH 10        // 10 seconds
+#define ANTI_SIPHON_PULSE_INTERVAL 10*60   // 10 minutes
+
+static void control_antiThermalSiphon(void)
+{
+  static long t0 = 0;
+  static circSolar = 0;
+
+  if (circSolar && time_elapsed_sec(t0) > ANTI_SIPHON_PULSE_LENGTH) {
+    debug_puts("d: anti-siphon circSolar=0\n");
+    circSolar=0;
+    fetSwitchOff(CIRCULATOR_Solar);
+  }
+  
+  if (time_elapsed_sec(t0) > ANTI_SIPHON_PULSE_INTERVAL) {
+
+    if ( thermal_isUnknown(thermal.collT) ||
+	 thermal_isUnknown(thermal.storT) ||
+	 gTemperature[TEMPERATURE_GlycolExchIn] == TEMPERATURE_UNKNOWN ||
+	 gTemperature[TEMPERATURE_GlycolExchMid] == TEMPERATURE_UNKNOWN ||
+	 gTemperature[TEMPERATURE_Basement] == TEMPERATURE_UNKNOWN ) {
+
+    } else if (	thermal.storT > (thermal.collT + 20.0) &&
+		gTemperature[TEMPERATURE_GlycolExchMid] < (gTemperature[TEMPERATURE_Basement] + 10.0) &&
+		gTemperature[TEMPERATURE_GlycolExchIn] > (gTemperature[TEMPERATURE_GlycolExchMid] + 10.0) ) {
+
+      debug_puts("d: anti-siphon circSolar=1\n");
+      circSolar=1;
+      fetSwitchOn(CIRCULATOR_Solar);
+      t0 = time_get();
+
+    }
+  }
+}
+
+
+
 double Vmain,Vpv;
 unsigned upTime;
 
@@ -243,4 +289,5 @@ void control_poll(void)
 
   control_thermalDump();
   control_houseHeat();
+  control_antiThermalSiphon();
 }
