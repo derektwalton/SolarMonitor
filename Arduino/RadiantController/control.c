@@ -214,11 +214,18 @@ static void control_houseHeat(void)
 
 
 /*
+
 Anti thermal siphon control
 
 It seems that the evauated tub thermal panels are much more prone to thermally driven
 glycol reverse siphon when the hot water tank is hot and the thermal panels are cool.
 We can detect this and attempt to neutralize it.
+
+Also, it looks like the collector temperature sensor doesn't get a true reading of the
+collector gycol temperature due to perhaps reverse flow of glycol or distance from the
+panels to the sensor.  This causes very high glycol temps in the panel prior to pump
+starting up in the morning.  So also activate the anti-thermal siphon if sunny is up
+(as detected by PV voltage) and pump is off.
 
 */
 
@@ -238,23 +245,37 @@ static void control_antiThermalSiphon(void)
   
   if (time_elapsed_sec(t0) > ANTI_SIPHON_PULSE_INTERVAL) {
 
-    if ( thermal_isUnknown(thermal.collT) ||
-	 thermal_isUnknown(thermal.storT) ||
-	 gTemperature[TEMPERATURE_GlycolExchIn] == TEMPERATURE_UNKNOWN ||
-	 gTemperature[TEMPERATURE_GlycolExchMid] == TEMPERATURE_UNKNOWN ||
-	 gTemperature[TEMPERATURE_Basement] == TEMPERATURE_UNKNOWN ) {
+    if (
+	 ! ( thermal_isUnknown(thermal.collT) ||
+	     thermal_isUnknown(thermal.storT) ||
+	     gTemperature[TEMPERATURE_GlycolExchIn] == TEMPERATURE_UNKNOWN ||
+	     gTemperature[TEMPERATURE_GlycolExchMid] == TEMPERATURE_UNKNOWN ||
+	     gTemperature[TEMPERATURE_Basement] == TEMPERATURE_UNKNOWN )
+	 &&
+	 ( thermal.storT > (thermal.collT + 20.0) &&
+	   gTemperature[TEMPERATURE_GlycolExchMid] < (gTemperature[TEMPERATURE_Basement] + 10.0) &&
+	   gTemperature[TEMPERATURE_GlycolExchIn] > (gTemperature[TEMPERATURE_GlycolExchMid] + 10.0) )
+	) {
 
-    } else if (	thermal.storT > (thermal.collT + 20.0) &&
-		gTemperature[TEMPERATURE_GlycolExchMid] < (gTemperature[TEMPERATURE_Basement] + 10.0) &&
-		gTemperature[TEMPERATURE_GlycolExchIn] > (gTemperature[TEMPERATURE_GlycolExchMid] + 10.0) ) {
-
-      debug_puts("d: anti-siphon circSolar=1\n");
+      debug_puts("d: anti-siphon circSolar=1 due to temps\n");
       circSolar=1;
       fetSwitchOn(CIRCULATOR_Solar);
       t0 = time_get();
 
+    } else if (
+	       ! ( thermal_isUnknown(thermal.pump) )
+	       &&
+	       ( thermal.pump==0 && Vpv > 6.0 )
+	       ) {
+      
+      debug_puts("d: anti-siphon circSolar=1 due to pump off and sunny\n");
+      circSolar=1;
+      fetSwitchOn(CIRCULATOR_Solar);
+      t0 = time_get();
+      
     }
   }
+
 }
 
 

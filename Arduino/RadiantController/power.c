@@ -27,7 +27,7 @@ double getPowerVoltage(POWER_t n)
   voltage = ((double) analog) / 255.0 * 5.0;
 
   // reverse out resistor divider
-  voltage *= 47.0 / 10.0;
+  voltage *= (47.0 + 10.0) / 10.0;
 
   return (voltage);
 }

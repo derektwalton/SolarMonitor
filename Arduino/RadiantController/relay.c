@@ -52,12 +52,12 @@ void relayOff(RELAY_t n)
 void relayInit(void)
 {
   // Output low (FETs off)
-  PORTB &= ~_BV(PB2); // bitwise AND with b01111111 (ie. PB2 -> 0)
+  PORTB &= ~_BV(PB2); // bitwise AND with b01111011 (ie. PB2 -> 0)
   PORTB &= ~_BV(PB3);
   PORTB &= ~_BV(PB4);
 
   // Set data direction to output (ie. drive the pins)
-  DDRB |= _BV(PB2); // bitwise OR with b10000000
-  DDRB |= _BV(PB3); // bitwise OR with b00000001
-  DDRB |= _BV(PB4); // bitwise OR with b00000010
+  DDRB |= _BV(PB2); // bitwise OR with b00000100
+  DDRB |= _BV(PB3); // bitwise OR with b00001000
+  DDRB |= _BV(PB4); // bitwise OR with b00010000
 }

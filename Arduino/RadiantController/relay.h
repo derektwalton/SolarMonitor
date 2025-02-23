@@ -11,10 +11,7 @@ typedef enum {
   RELAY_2 = 2
 } RELAY_t;
 
-
-#define RELAY_heat1stFloorBoost RELAY_0
-#define RELAY_heat2ndFloorBoost RELAY_1
-#define RELAY_finnedTubeDump RELAY_2
+#define RELAY_finnedTubeDump RELAY_0
 
 void relayOn(RELAY_t n);
 void relayOff(RELAY_t n);

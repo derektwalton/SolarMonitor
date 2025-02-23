@@ -9,18 +9,17 @@
 #include "cmdrsp.h"
 
 
-int heatBoost1stFloorTargetTemp=0;
-int heatBoost1stFloorMinutes=0;
-int heatBoost2ndFloorTargetTemp=0;
-int heatBoost2ndFloorMinutes=0;
-
-
 #if NO_I2C 
 
 void cmdrsp_poll(void)
 {}
 
 #else
+
+int heatBoost1stFloorTargetTemp=0;
+int heatBoost1stFloorMinutes=0;
+int heatBoost2ndFloorTargetTemp=0;
+int heatBoost2ndFloorMinutes=0;
 
 /*
 
