@@ -9,12 +9,6 @@
 #include "f007th.h"
 #include "led.h"
 
-#if D3_USED_BY_F007TH
-#define RF_GPIO (PIND & _BV(PD3))
-#else
-# error need pin for F007TH data input
-#endif
-
 static long tick = 0;
 static uint8_t subtick = 0;
 

@@ -30,10 +30,7 @@ void ledOn(LED_t n)
 #endif
       break;
     case LED_10:
-#if D3_USED_BY_F007TH
-#else
       DDRD |= _BV(PD3);
-#endif
       break;
     case LED_11:
       DDRD |= _BV(PD4);
@@ -55,10 +52,7 @@ void ledOff(LED_t n)
 #endif
       break;
     case LED_10:
-#if D3_USED_BY_F007TH
-#else
       DDRD &= ~_BV(PD3);
-#endif
       break;
     case LED_11:
       DDRD &= ~_BV(PD4);
@@ -77,10 +71,7 @@ void ledInit()
 #else
   PORTD |= _BV(PD2);
 #endif
-#if D3_USED_BY_F007TH
-#else
   PORTD |= _BV(PD3);
-#endif
   PORTD |= _BV(PD4);
   PORTB |= _BV(PB5);
 }

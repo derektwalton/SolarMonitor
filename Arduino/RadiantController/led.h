@@ -14,16 +14,12 @@ typedef enum {
 
 
 #define D2_USED_BY_ONEWIRE 1
-#define D3_USED_BY_F007TH 1
 
 #if (D2_USED_BY_ONEWIRE==0)
 #define LED_MAIN_POWER_OK       LED_9
 #endif
 
-#if (D3_USED_BY_F007TH==0)
 #define LED_PV_POWER_OK         LED_10
-#endif
-
 #define LED_THERMAL_STATUS_OK   LED_11
 #define LED_ONEWIRE_STATUS_OK   LED_12
 

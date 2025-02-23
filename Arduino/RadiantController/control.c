@@ -280,28 +280,17 @@ static void control_antiThermalSiphon(void)
 
 
 
-double Vmain,Vpv;
+double Vpv;
 unsigned upTime;
 
 void control_poll(void)
 {
-
-  Vmain = getPowerVoltage(POWER_Vmain);
   Vpv = getPowerVoltage(POWER_Vpv);
 
-#if (D2_USED_BY_ONEWIRE==0)
-  if (Vmain < 8.0)
-    ledOff(LED_MAIN_POWER_OK);
-  else
-    ledOn(LED_MAIN_POWER_OK);
-#endif
-
-#if (D3_USED_BY_F007TH==0)
   if (Vpv < 8.0)
     ledOff(LED_PV_POWER_OK);
   else
     ledOn(LED_PV_POWER_OK);
-#endif
   
   upTime = time_elapsed_sec((long) 0 );
   temperature_UpdateTemperatures();

@@ -15,9 +15,6 @@ double getPowerVoltage(POWER_t n)
   int analog=0;
   
   switch(n) {
-  case POWER_Vmain:
-    analog = adcSample(ADC_CHANNEL_Vmain);
-    break;
   case POWER_Vpv:
     analog = adcSample(ADC_CHANNEL_Vpv);
     break;    

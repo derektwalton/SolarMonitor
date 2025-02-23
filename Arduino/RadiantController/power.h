@@ -2,7 +2,6 @@
 #define __power_h__
 
 typedef enum {
-  POWER_Vmain,
   POWER_Vpv
 } POWER_t;
 

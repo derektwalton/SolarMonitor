@@ -19,9 +19,8 @@ typedef enum {
   ADC_CHANNEL_gnd = 15,
 } ADC_CHANNEL_t;
 
-#define ADC_CHANNEL_Vpv       ADC_CHANNEL_adc2
 #define ADC_CHANNEL_Vswitch0  ADC_CHANNEL_adc3
-#define ADC_CHANNEL_Vmain     ADC_CHANNEL_adc6
+#define ADC_CHANNEL_Vpv       ADC_CHANNEL_adc6
 #define ADC_CHANNEL_Vswitch1  ADC_CHANNEL_adc7
 #define ADC_CHANNEL_Tstat0    ADC_CHANNEL_adc1
 #define ADC_CHANNEL_Tstat1    ADC_CHANNEL_adc0

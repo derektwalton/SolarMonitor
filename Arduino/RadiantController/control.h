@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-extern double Vmain,Vpv;
+extern double Vpv;
 extern unsigned upTime;
 
 extern int circulatorRadiant;

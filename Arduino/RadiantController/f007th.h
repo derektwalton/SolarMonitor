@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define RF_GPIO (PINC & _BV(PC2))
+
 // call at least every 5 mSec
 void f007th_poll(void);
 

@@ -95,7 +95,7 @@ void transmit(void)
       sprintf(s+strlen(s),"%s ",thermal_isUnknown(thermal.pump) ? " ? " : thermal.pump ? "ON " : " . ");
       sprintf(s+strlen(s),"%s ",thermal_isUnknown(thermal.uplim) ? " ? " : thermal.uplim ? "ON " : " . ");
       
-      sprintf(s+strlen(s),"%4.1f ",Vmain);
+      sprintf(s+strlen(s),"%4.1f ",0.0);
       sprintf(s+strlen(s),"%4.1f ",Vpv);
       for(i=0;i<10;i++) {
 	switch(i) {

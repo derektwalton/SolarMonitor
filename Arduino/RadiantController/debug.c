@@ -144,10 +144,9 @@ void debug(char *s)
   case 'V':
     // s[0]: V = power supply voltages
     {
-      double Vmain,Vpv;
-      Vmain = getPowerVoltage(POWER_Vmain);
+      double Vpv;
       Vpv = getPowerVoltage(POWER_Vpv);
-      sprintf(s,"Vmain = %lf, Vpv = %lf\n",Vmain,Vpv);
+      sprintf(s,"Vpv = %lf\n",Vpv);
     }
     break;
     
