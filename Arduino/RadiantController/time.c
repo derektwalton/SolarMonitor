@@ -16,9 +16,11 @@ static uint8_t subtick = 0;
 // Timer 2 overflow interrupt
 ISR(TIMER2_OVF_vect)
 {
+  unsigned char rf_io = RF_GPIO;
+  unsigned char uart2400_io = UART2400_GPIO;
+  uart2400_sample(uart2400_io);
+  f007th_sample(rf_io);
   subtick++;
-  f007th_sample(RF_GPIO);
-  uart2400_sample();
   if (subtick==10) {
     subtick=0;
     tick++;

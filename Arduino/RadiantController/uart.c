@@ -4,8 +4,6 @@
 #include "defines.h"
 #include "uart.h"
 
-#define UART_BAUD  57600
-
 static char *txptr;
 static void (*txcallback)(void);
 
@@ -143,24 +141,24 @@ void uart_init(void)
 // ticks.  Hopefully this is enough oversampling to get reliable
 // data recovery.
 //
-// Time(mS)   Sample
+// Time(mS)  Sample
 // ------------------------------------------------
-//  0                   begin of start bit
-//  0.208      2.1      middle of start bit
-//  0.625      6.3      middle of bit 0
-//  1.042     10.4      middle of bit 1
-//  1.458     14.6      middle of bit 2
-//  1.875     18.8      middle of bit 3
-//  2.292     22.9      middle of bit 4
-//  2.708     27.1      middle of bit 5
-//  3.125     31.3      middle of bit 6
-//  3.542     35.4      middle of bit 7
-//  3.958     39.6      middle of stop bit
+//  0                 begin of start bit
+//  0.208      2      middle of start bit
+//  0.625      6      middle of bit 0
+//  1.042     10      middle of bit 1
+//  1.458     15      middle of bit 2
+//  1.875     19      middle of bit 3
+//  2.292     23      middle of bit 4
+//  2.708     27      middle of bit 5
+//  3.125     31      middle of bit 6
+//  3.542     35      middle of bit 7
+//  3.958     40      middle of stop bit
 //
 //
 
 static char *rxptr_2400;
-static int rxi_2400, rxnum_2400;
+int rxi_2400, rxnum_2400;
 static void (*rxcallback_2400)(char *s, int n, int error);
 
 int uart2400_gets
@@ -185,7 +183,7 @@ int uart2400_gets
   return 0;
 }
 
-static char UDR_2400;
+static unsigned char UDR_2400;
 
 static void uart2400_rx_complete()
 {
@@ -212,12 +210,12 @@ static void uart2400_rx_complete()
   clast = c;
 }
 
-void uart2400_sample(void)
+unsigned char sample=0xff;
+void uart2400_sample(unsigned char rxwire)
 {
-  static char sample=0xff;
-  char rxwire = PINC & _BV(PC5);
   if (sample==0xff) {
-    if (!rxwire) sample=0;
+    if (!rxwire)
+      sample=0;
   } else {
     sample++;
     if (sample==6  ||
@@ -231,8 +229,9 @@ void uart2400_sample(void)
       UDR_2400 = (UDR_2400>>1) | (rxwire ? 0x80 : 0x00);
     }
     if (sample==40) {
-      uart2400_rx_complete();
-      sample==0xff;
+      if (rxwire)
+	uart2400_rx_complete();
+      sample=0xff;
     }
   }
 }

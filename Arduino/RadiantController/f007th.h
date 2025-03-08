@@ -9,7 +9,7 @@
 void f007th_poll(void);
 
 // call every 100 usec (10 kHz) with value of GPIO pin connected to 433MHz receiver
-void f007th_sample(unsigned sample);
+void f007th_sample(unsigned char sample);
 
 // callback to receive decoded temperature, etc.
 void f007th_callback(uint8_t channel, int16_t tempx10, uint8_t humidity, uint8_t low_battery);

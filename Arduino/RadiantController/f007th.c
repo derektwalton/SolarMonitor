@@ -40,7 +40,7 @@ void f007th_poll(void)
 }
 
 // call every 100 usec (10 kHz) with value of GPIO pin connected to 433MHz receiver
-void f007th_sample(unsigned sample)
+void f007th_sample(unsigned char sample)
 {
   if (initComplete) {
     if (sample)

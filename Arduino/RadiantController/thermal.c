@@ -163,7 +163,7 @@ static int parseLine(char *s)
 
 void thermal_poll(void)
 {
-  static char s[MAXLEN];
+  static unsigned char s[MAXLEN];
   static int needsInit = 1;
   static long t0;
   static int timeoutCount = 0;
@@ -180,7 +180,11 @@ void thermal_poll(void)
     needsInit = 0;
     rxdone = 0;
     t0 = time_get();
+#if (UART_BAUD==2400)
+    uart_gets(s, sizeof(s), rxcb);
+#else
     uart2400_gets(s, sizeof(s), rxcb);
+#endif
   }
 
   else if (time_elapsed_sec(t0) > TIMEOUT) {

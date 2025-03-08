@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//#define UART_BAUD  57600
+#define UART_BAUD  2400
+
   int uart_puts
   ( char *s, 
     void (*callback)(void) );
@@ -19,7 +22,9 @@ extern "C" {
     int len, 
     void(*callback)(char *s, int n, int error) );
   
-  void uart2400_sample(void);
+#define UART2400_GPIO (PINC & _BV(PC5))
+
+  void uart2400_sample(unsigned char rxwire);
   
   void uart_init(void);
   
