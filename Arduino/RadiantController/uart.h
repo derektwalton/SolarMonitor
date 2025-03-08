@@ -5,17 +5,24 @@
 extern "C" {
 #endif
 
-int uart_puts
-( char *s, 
- void (*callback)(void) );
-
-int uart_gets
-( char *s, 
-  int len, 
-  void(*callback)(char *s, int n, int error) );
-
-void uart_init(void);
-
+  int uart_puts
+  ( char *s, 
+    void (*callback)(void) );
+  
+  int uart_gets
+  ( char *s, 
+    int len, 
+    void(*callback)(char *s, int n, int error) );
+  
+  int uart2400_gets
+  ( char *s, 
+    int len, 
+    void(*callback)(char *s, int n, int error) );
+  
+  void uart2400_sample(void);
+  
+  void uart_init(void);
+  
 #ifdef __cplusplus
 }
 #endif

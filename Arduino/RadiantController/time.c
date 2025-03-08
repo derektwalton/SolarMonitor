@@ -7,6 +7,7 @@
 #include "time.h"
 
 #include "f007th.h"
+#include "uart.h"
 #include "led.h"
 
 static long tick = 0;
@@ -17,6 +18,7 @@ ISR(TIMER2_OVF_vect)
 {
   subtick++;
   f007th_sample(RF_GPIO);
+  uart2400_sample();
   if (subtick==10) {
     subtick=0;
     tick++;

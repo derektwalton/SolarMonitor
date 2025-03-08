@@ -11,7 +11,7 @@
 
 /* baudrate settings are defined in <asm/termbits.h>, which is
 included by <termios.h> */
-#define BAUDRATE B2400            
+#define BAUDRATE B57600            
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
 #define MAXLEN (200+1)    // 200 characters plus termination 0
