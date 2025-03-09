@@ -155,6 +155,8 @@ void uart_init(void)
 //  3.542     35      middle of bit 7
 //  3.958     40      middle of stop bit
 //
+// NOTE: In the below code I have adjusted the sample #'s based
+// on review of waveforms.
 //
 
 static char *rxptr_2400;
@@ -220,20 +222,19 @@ void uart2400_sample(unsigned char rxwire)
     sample++;
     if (sample==6  ||
 	sample==10 ||
-	sample==15 ||
-	sample==19 ||
-	sample==23 ||
-	sample==27 ||
-	sample==31 ||
-	sample==35) {
+	sample==14 ||
+	sample==18 ||
+	sample==22 ||
+	sample==26 ||
+	sample==30 ||
+	sample==34) {
       UDR_2400 = (UDR_2400>>1) | (rxwire ? 0x80 : 0x00);
     }
-    if (sample==40) {
+    if (sample==38) {
+      //UDR0=UDR_2400;
       if (rxwire)
 	uart2400_rx_complete();
       sample=0xff;
     }
   }
 }
-
-

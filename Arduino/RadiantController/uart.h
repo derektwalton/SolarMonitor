@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-//#define UART_BAUD  57600
-#define UART_BAUD  2400
+#define UART_BAUD  57600
+//#define UART_BAUD  2400
 
   int uart_puts
   ( char *s, 
